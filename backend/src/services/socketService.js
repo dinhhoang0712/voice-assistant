@@ -5,7 +5,7 @@ export const initializeSocket = (socketIo) => {
   console.log('Socket service initialized');
 };
 
-export const emitReminderNotification = (userId, message) => {
+export const emitReminderNotification = (userId, message, reminderId = null) => {
   if (!io) {
     console.error('Socket.IO not initialized');
     return;
@@ -15,6 +15,7 @@ export const emitReminderNotification = (userId, message) => {
   io.to(`user_${userId}`).emit('reminder_notification', {
     type: 'reminder',
     message,
+    reminderId,
     timestamp: new Date().toISOString(),
     userId
   });

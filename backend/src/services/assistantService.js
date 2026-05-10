@@ -54,8 +54,7 @@ export const handleVoiceChat = async ({
     case "personalize":
       reply = await handlePersonalization(userId, text);
       if (!reply) {
-        reply =
-          "Bạn muốn mình ghi nhớ điều gì về bạn? Ví dụ: “tôi tên là …”, “tôi thích …”.";
+        reply = await qaHandler(text, userId);
       }
       break;
 

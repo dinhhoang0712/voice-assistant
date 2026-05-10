@@ -16,12 +16,19 @@ import reminderRoutes from "./routes/reminderRoutes.js";
 import { initializeSocketHandlers } from "./socket/index.js";
 import reminderWorker from "./workers/reminderWorker.js";
 import { historyRouter } from "./routes/historyRouter.js";
+import { userRouter } from "./routes/userRouter.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const server = createServer(app);
+
+/** CORS: `origin: true` phản chiếu Origin khi env là * — tránh lỗi trình duyệt với credentials. */
+const corsOriginOption =
+  !env.corsOrigin || env.corsOrigin === "*" ? true : env.corsOrigin;
+
 const io = new Server(server, {
   cors: {
-    origin: env.corsOrigin,
+    origin: corsOriginOption,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -32,9 +39,10 @@ const PORT = env.port;
 // middlewares
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(cookieParser());
-app.use(cors({ origin: env.corsOrigin, credentials: true }));
+app.use(cors({ origin: corsOriginOption, credentials: true }));
 
 /**
  * @swagger
@@ -52,11 +60,15 @@ app.use(cors({ origin: env.corsOrigin, credentials: true }));
  */
 app.get("/health", (_req, res) => res.json({ ok: true }));
 // Swagger documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Voice Assistant Backend API Documentation"
-}));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Voice Assistant Backend API Documentation",
+  }),
+);
 
 app.use("/api/auth", authRouter);
 
@@ -65,6 +77,9 @@ app.use(protectedRoute);
 app.use("/api/assistant", assistantRouter);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/history", historyRouter);
+app.use("/api/user", userRouter);
+app.use(errorHandler);
+
 connectDb().then(() => {
   // Initialize Socket.IO handlers
   initializeSocketHandlers(io);

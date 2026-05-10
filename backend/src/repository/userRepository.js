@@ -1,22 +1,24 @@
 import { User } from "../model/User.js";
 
 function deepMerge(oldObj = {}, newObj = {}) {
+  const result = structuredClone(oldObj);
+
   for (const key in newObj) {
     if (
-      oldObj[key] &&
-      typeof oldObj[key] === "object" &&
-      !Array.isArray(oldObj[key]) &&
+      result[key] &&
+      typeof result[key] === "object" &&
+      !Array.isArray(result[key]) &&
       typeof newObj[key] === "object" &&
       !Array.isArray(newObj[key])
     ) {
-      oldObj[key] = deepMerge(oldObj[key], newObj[key]);
+      result[key] = deepMerge(result[key], newObj[key]);
     } else {
-      oldObj[key] = newObj[key];
+      result[key] = newObj[key];
     }
   }
-  return oldObj;
-}
 
+  return result;
+}
 export const findUserById = async (id, options = {}) => {
   const user = await User.findByPk(id, options);
   if (!user) throw new Error("User not found");
@@ -42,9 +44,9 @@ export const updateUserProfile = async (userId, newData) => {
   const user = await User.findByPk(userId);
   if (!user) return null;
 
-  const profile = user.profile || {};
-  user.profile = deepMerge(profile, newData);
+  user.profile = deepMerge(user.profile || {}, newData);
 
   await user.save();
+
   return user.profile;
 };

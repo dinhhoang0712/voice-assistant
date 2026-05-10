@@ -13,7 +13,16 @@ export const MEMORY_RULES = [
 
     template: "Đã ghi nhớ bạn thích câu trả lời ngắn gọn.",
   },
-
+  {
+    field: "assistant_name",
+    patterns: [
+      /.*tên.*trợ lý.*là (.+)/i,
+      /.*gọi.*bạn.*là (.+)/i,
+      /.*đổi.*tên.*trợ lý.*thành (.+)/i,
+      /.*assistant.*name.*is (.+)/i,
+    ],
+    template: "Đã ghi nhớ tên mà bạn đã đặt cho tôi.",
+  },
   {
     field: "answer_length",
 
@@ -167,7 +176,15 @@ export const PROFILE_QUERY_PATTERNS = [
     patterns: [/.*tên.*tôi.*gì.*/, /.*tôi.*tên.*gì.*/],
     template: "Bạn tên là {}.",
   },
-
+  {
+    field: "assistant_name",
+    patterns: [
+      /.*tên.*trợ lý.*là.*gì.*/i,
+      /.*tôi.*đặt.*tên.*bạn.*là.*gì.*/i,
+      /.*bạn.*tên.*gì.*/i,
+    ],
+    template: "Tên của tôi là {}.",
+  },
   {
     field: "age",
     patterns: [/.*tôi.*bao nhiêu tuổi.*/, /.*tuổi.*tôi.*bao nhiêu.*/],
@@ -211,6 +228,15 @@ export const PROFILE_QUERY_PATTERNS = [
   },
 
   {
+    field: "favorite_food",
+    patterns: [
+      /.*món.*ăn.*yêu thích.*của.*tôi.*là.*gì.*/,
+      /.*tôi.*thích.*ăn.*gì.*/,
+    ],
+    template: "Món ăn yêu thích của bạn là {}.",
+  },
+
+  {
     field: "hobbies",
     patterns: [/.*tôi.*thích.*gì.*/, /.*sở thích.*của.*tôi.*là.*gì.*/],
     template: "Bạn thích {}.",
@@ -223,15 +249,6 @@ export const PROFILE_QUERY_PATTERNS = [
       /.*tôi.*thích.*màu.*gì.*/,
     ],
     template: "Màu yêu thích của bạn là {}.",
-  },
-
-  {
-    field: "favorite_food",
-    patterns: [
-      /.*món.*ăn.*yêu thích.*của.*tôi.*là.*gì.*/,
-      /.*tôi.*thích.*ăn.*gì.*/,
-    ],
-    template: "Món ăn yêu thích của bạn là {}.",
   },
 
   {

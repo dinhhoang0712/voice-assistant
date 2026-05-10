@@ -24,18 +24,15 @@ export const protectedRoute = (req, res, next) => {
           .json({ message: "Access token hết hạn hoặc không đúng" });
       }
 
-      // tìm user
-      const user = await findUserById(decodedUser.userId, {
-        attributes: { exclude: ["hashedPassword"] },
-      });
-
-      if (!user) {
+      try {
+        const user = await findUserById(decodedUser.userId, {
+          attributes: { exclude: ["hashedPassword"] },
+        });
+        req.user = user;
+        next();
+      } catch {
         return res.status(404).json({ message: "người dùng không tồn tại." });
       }
-
-      // trả user về trong req
-      req.user = user;
-      next();
     });
   } catch (error) {
     console.error("Lỗi khi xác minh JWT trong authMiddleware", error);

@@ -54,7 +54,7 @@ class ReminderWorker {
         try {
           // Send notification via Socket.IO
           const message = `Đến giờ "${reminder.title}" rồi!`;
-          emitReminderNotification(reminder.userId, message);
+          emitReminderNotification(reminder.userId, message, reminder.id);
 
           // Mark as notified using repository function
           await markReminderAsNotified(reminder.id);

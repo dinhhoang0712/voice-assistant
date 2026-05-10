@@ -17,9 +17,12 @@ export const upload = multer({
       "audio/mp4",
       "audio/ogg",
     ];
+    const base = (file.mimetype || "").split(";")[0].trim().toLowerCase();
 
-    if (!allowed.includes(file.mimetype)) {
-      return cb(new Error("Invalid audio type"));
+    if (!allowed.includes(base)) {
+      const err = new Error("Invalid audio type");
+      err.statusCode = 415;
+      return cb(err);
     }
 
     cb(null, true);

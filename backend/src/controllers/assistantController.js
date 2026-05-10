@@ -47,7 +47,7 @@ export const voiceChat = async (req, res) => {
 
 export const speak = async (req, res) => {
   try {
-    const { text } = req.body;
+    const text = req.body?.text ?? req.body?.message;
 
     if (!text) {
       return res.status(400).json({
@@ -74,7 +74,7 @@ export const speak = async (req, res) => {
 
 export const chat = async (req, res) => {
   try {
-    const { text } = req.body;
+    const text = req.body?.text ?? req.body?.message;
     if (!text) {
       return res.status(400).json({
         error: "Text is required",

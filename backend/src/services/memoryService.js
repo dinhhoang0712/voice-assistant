@@ -12,34 +12,41 @@ function isInvalidMemoryValue(value) {
 
 async function saveMemory(userId, field, value) {
   const profile = await getUserProfile(userId);
-  const oldValue = profile[field];
 
-  // hobbies array
+  const oldValue = profile?.[field];
+
   if (field === "hobbies") {
+    const normalizedValue = typeof value === "string" ? value.trim() : value;
+
     const hobbies = new Set(profile.hobbies || []);
-    hobbies.add(value);
+
+    if (hobbies.has(normalizedValue)) {
+      return null;
+    }
+
+    hobbies.add(normalizedValue);
 
     await updateUserProfile(userId, {
       hobbies: [...hobbies],
     });
 
-    return `Đã thêm sở thích: ${value}.`;
+    return `Đã thêm sở thích: ${normalizedValue}.`;
   }
 
-  // normal field update
-  if (oldValue && oldValue !== value) {
-    await updateUserProfile(userId, {
-      [field]: value,
-    });
-
-    return `Đã cập nhật ${field} từ ${oldValue} thành ${value}.`;
+  if (oldValue === value) {
+    return null;
   }
 
+  // update field
   await updateUserProfile(userId, {
     [field]: value,
   });
 
-  return null;
+  if (oldValue !== undefined && oldValue !== null) {
+    return `Đã cập nhật ${field} từ ${oldValue} thành ${value}.`;
+  }
+
+  return `Đã ghi nhớ ${field}: ${value}.`;
 }
 
 export async function handlePersonalization(userId, text) {

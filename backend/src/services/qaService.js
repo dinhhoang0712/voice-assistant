@@ -39,13 +39,13 @@ export const qaHandler = async (rawText, userId) => {
 };
 
 function retrieveProfileAnswer(profile, text) {
+  console.log("-------------Profile for QA:", profile);
   for (const rule of PROFILE_QUERY_PATTERNS) {
     for (const pattern of rule.patterns) {
       const regex = new RegExp(pattern);
 
       if (regex.test(text)) {
         const value = profile[rule.field];
-
         if (value) {
           return rule.template.replace("{}", value);
         }

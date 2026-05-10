@@ -6,9 +6,10 @@ import {
 
 export const register = async (req, res) => {
   try {
-    const user = await registerUser(req.body ?? {});
+    const { accessToken, user } = await registerUser(req.body ?? {});
     return res.status(201).json({
       message: "Đăng ký thành công.",
+      accessToken,
       user,
     });
   } catch (error) {
