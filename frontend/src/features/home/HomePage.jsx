@@ -1,12 +1,21 @@
+import { useState } from "react";
+import { MessageCircle, X } from "lucide-react";
+
 import { useHomeAssistant } from "./useHomeAssistant";
+
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeDrawer } from "./components/HomeDrawer";
 import { HomeHero } from "./components/HomeHero";
+
 import { ReminderBanner } from "./components/ReminderBanner";
 import { ChatThread } from "./components/ChatThread";
 import { ChatComposer } from "./components/ChatComposer";
 
+import { VoiceChatModal } from "./components/VoiceChatModal";
+
 export default function HomePage() {
+  const [chatOpen, setChatOpen] = useState(true);
+
   const {
     userData,
     logout,
@@ -24,8 +33,10 @@ export default function HomePage() {
     ackLoading,
     assistantLabel,
     avatarSrc,
+
     sendText,
     toggleRecording,
+
     dismissReminder,
     acknowledgeReminder,
   } = useHomeAssistant();
@@ -36,7 +47,8 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-[#030a1a] via-[#0a1628] to-black text-white flex flex-col">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-[#030a1a] via-[#0a1628] to-black text-white flex flex-col">
+      {/* HEADER */}
       <HomeHeader
         userName={userData?.name}
         avatarSrc={avatarSrc}
@@ -45,6 +57,7 @@ export default function HomePage() {
         onLogout={handleLogout}
       />
 
+      {/* DRAWER */}
       <HomeDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -54,45 +67,123 @@ export default function HomePage() {
         assistantLabel={assistantLabel}
       />
 
-      <main className="flex-1 flex flex-col max-w-3xl w-full mx-auto px-4 pb-6 pt-4">
-        <HomeHero
-          assistantLabel={assistantLabel}
-          avatarSrc={avatarSrc}
-          recording={recording}
-          speaking={speaking}
-          busy={busy}
-        />
+      {/* MAIN */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* CENTER VOICE AREA */}
+        <div className="flex-1 relative flex flex-col items-center justify-center px-6">
+          {/* Toggle chat button */}
+          <button
+            onClick={() => setChatOpen(!chatOpen)}
+            className="absolute top-4 right-4 z-20 flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition"
+          >
+            {chatOpen ? (
+              <>
+                <X className="w-4 h-4" />
+                <span className="text-sm">Ẩn chat</span>
+              </>
+            ) : (
+              <>
+                <MessageCircle className="w-4 h-4" />
+                <span className="text-sm">Mở chat</span>
+              </>
+            )}
+          </button>
 
-        {reminderToast && (
-          <ReminderBanner
-            message={reminderToast.message}
-            reminderId={reminderToast.reminderId}
-            ackLoading={ackLoading}
-            onAcknowledge={acknowledgeReminder}
-            onDismiss={dismissReminder}
-          />
-        )}
+          {/* Reminder */}
+          {reminderToast && (
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 w-full max-w-xl">
+              <ReminderBanner
+                message={reminderToast.message}
+                reminderId={reminderToast.reminderId}
+                ackLoading={ackLoading}
+                onAcknowledge={acknowledgeReminder}
+                onDismiss={dismissReminder}
+              />
+            </div>
+          )}
 
-        {error && (
-          <div className="mb-3 rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-            {error}
+          {/* Error */}
+          {error && (
+            <div className="absolute top-36 left-1/2 -translate-x-1/2 z-20 w-full max-w-xl">
+              <div className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                {error}
+              </div>
+            </div>
+          )}
+
+          {/* HERO */}
+          <div className="mb-8">
+            <HomeHero
+              assistantLabel={assistantLabel}
+              avatarSrc={avatarSrc}
+              recording={recording}
+              speaking={speaking}
+              busy={busy}
+            />
           </div>
-        )}
 
-        <ChatThread history={history} />
+          {/* MAIN VOICE UI */}
+          <VoiceChatModal
+            recording={recording}
+            speaking={speaking}
+            busy={busy}
+            onToggleRecording={toggleRecording}
+            assistantLabel={assistantLabel}
+          />
+        </div>
 
-        <ChatComposer
-          input={input}
-          onInputChange={setInput}
-          busy={busy}
-          recording={recording}
-          onSend={() => {
-            sendText(input);
-            setInput("");
-          }}
-          onToggleRecord={toggleRecording}
-        />
-      </main>
+        {/* RIGHT CHAT PANEL */}
+        <div
+          className={`
+            transition-all duration-300 border-l border-white/10 bg-[#081120]
+            flex flex-col overflow-hidden
+            ${chatOpen ? "w-[420px] opacity-100" : "w-0 opacity-0"}
+          `}
+        >
+          {chatOpen && (
+            <>
+              {/* CHAT HEADER */}
+              <div className="h-16 border-b border-white/10 flex items-center justify-between px-4 shrink-0">
+                <div>
+                  <div className="font-semibold">Chat</div>
+                  <div className="text-xs text-white/50">
+                    Trò chuyện bằng văn bản
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setChatOpen(false)}
+                  className="p-2 rounded-lg hover:bg-white/10 transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* CHAT THREAD */}
+              <div className="flex-1 overflow-y-auto">
+                <ChatThread history={history} />
+              </div>
+
+              {/* CHAT INPUT */}
+              <div className="border-t border-white/10 p-3 shrink-0">
+                <ChatComposer
+                  input={input}
+                  onInputChange={setInput}
+                  busy={busy}
+                  recording={recording}
+                  onSend={() => {
+                    if (!input.trim()) return;
+
+                    sendText(input);
+                    setInput("");
+                  }}
+                  onToggleRecord={toggleRecording}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
