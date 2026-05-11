@@ -160,9 +160,13 @@ export default function HomePage() {
               </div>
 
               {/* CHAT THREAD */}
+<<<<<<< HEAD
               <div className="flex-1 overflow-y-auto">
                 <ChatThread history={history} />
               </div>
+=======
+              <ChatThread history={history} />
+>>>>>>> origin/thanhhoa
 
               {/* CHAT INPUT */}
               <div className="border-t border-white/10 p-3 shrink-0">

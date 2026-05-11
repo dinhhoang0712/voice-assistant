@@ -14,6 +14,7 @@ export const upload = multer({
       "audio/webm",
       "audio/wav",
       "audio/mpeg",
+      "video/webm",
       "audio/mp4",
       "audio/ogg",
     ];

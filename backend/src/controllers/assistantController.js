@@ -31,6 +31,10 @@ export const voiceChat = async (req, res) => {
       reply: result?.reply ?? "",
       action: result?.action ?? null,
       platform: result?.platform ?? "unknown",
+<<<<<<< HEAD
+=======
+      user_text: result?.user_text ?? "",
+>>>>>>> origin/thanhhoa
     });
   } catch (error) {
     console.error("Voice Chat Error:", error);
@@ -47,7 +51,11 @@ export const voiceChat = async (req, res) => {
 
 export const speak = async (req, res) => {
   try {
+<<<<<<< HEAD
     const text = req.body?.text ?? req.body?.message;
+=======
+    const text = req.body?.text ?? req.body?.message ?? req.query?.text;
+>>>>>>> origin/thanhhoa
 
     if (!text) {
       return res.status(400).json({
@@ -95,6 +103,10 @@ export const chat = async (req, res) => {
       reply: result?.reply ?? "",
       action: result?.action ?? null,
       platform: result?.platform ?? "unknown",
+<<<<<<< HEAD
+=======
+      user_text: result?.user_text ?? "",
+>>>>>>> origin/thanhhoa
     });
   } catch (error) {
     console.error("Voice Chat Error:", error);
