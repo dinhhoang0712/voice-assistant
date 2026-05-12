@@ -1,6 +1,10 @@
-import { registerVoiceSocket } from "./voice.socket.js";
+import { registerVoiceSocket } from "./voiceSocket.js";
+import { initReminderSocket } from "./reminderSocket.js";
+import { setIO } from "./ioInstance.js";
 
 export const initializeSocketHandlers = (io) => {
+  setIO(io);
+
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
@@ -10,4 +14,6 @@ export const initializeSocketHandlers = (io) => {
       console.log("Socket disconnected:", socket.id);
     });
   });
+
+  initReminderSocket(io);
 };

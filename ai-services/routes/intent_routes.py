@@ -30,7 +30,7 @@ def predict():
         }), 400
 
     intent = classify_intent(text)
-
+    print("intent-------", intent)
     return jsonify({
         "success": True,
         "intent": intent

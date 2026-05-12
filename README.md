@@ -10,7 +10,8 @@ Dự án được xây dựng theo kiến trúc microservices với 3 thành ph�
 voice-assistant/
 ├── ai-services/          # Microservice AI (Python/Flask)
 ├── backend/              # API Backend (Node.js/Express)
-└── frontend/             # Giao diện Web (React/Vite)
+├── frontend/             # Giao diện Web (React/Vite)
+└── mobile/               # Mobile App (React Native/Expo)
 ```
 
 ## 🚀 Tính năng Chính
@@ -26,7 +27,7 @@ voice-assistant/
 - **Trò chuyện giọng nói**: Xử lý audio real-time
 - **Trò chuyện văn bản**: Chat-based communication
 - **LLM Integration**: Kết nối với Language Model (Gemma-3-4B) cho AI responses
-- **Nhắc nhở thông minh**: Smart reminders với background workers
+- **Nhắc nhở thông minh**: Smart reminders với BullMQ + Redis workers
 - **Lịch sử trò chuyện**: Lưu trữ và truy xuất cuộc hội thoại
 - **Real-time communication**: Socket.IO cho cập nhật real-time
 - **Weather Integration**: Lấy thông tin thời tiết thực tế
@@ -37,6 +38,14 @@ voice-assistant/
 - **Real-time updates**: Kết nối Socket.IO client
 - **Voice recording**: Ghi âm và xử lý audio
 - **User authentication**: Đăng nhập/đăng ký người dùng
+
+### 📱 Mobile App (React Native/Expo)
+- **Cross-platform**: iOS, Android, Web
+- **Voice Chat**: Ghi âm và xử lý giọng nói
+- **Real-time Communication**: Socket.IO integration
+- **Navigation**: React Navigation
+- **Audio Processing**: Expo Audio & AV
+- **Offline Support**: Local storage cho conversations
 
 ## 🛠️ Công nghệ Sử dụng
 
@@ -56,6 +65,8 @@ voice-assistant/
 - **Security**: Helmet, CORS, bcrypt
 - **LLM**: Gemma-3-4B integration
 - **Weather API**: OpenWeatherMap integration
+- **BullMQ**: Queue system cho background jobs (reminders)
+- **Redis**: Message broker và caching cho BullMQ
 
 ### Frontend
 - **Framework**: React 19
@@ -65,6 +76,15 @@ voice-assistant/
 - **HTTP Client**: Axios
 - **Real-time**: Socket.IO Client
 - **Icons**: React Icons
+
+### Mobile
+- **Framework**: React Native 0.81
+- **Platform**: Expo SDK 54
+- **Navigation**: React Navigation v7
+- **Audio**: Expo Audio & AV
+- **Storage**: AsyncStorage
+- **Real-time**: Socket.IO Client
+- **HTTP Client**: Axios
 
 ## 📦 Cài đặt và Cấu hình
 
@@ -106,6 +126,12 @@ cd ../frontend
 npm install
 ```
 
+### 5. Cài đặt Mobile App
+```bash
+cd ../mobile
+npm install
+```
+
 ### 5. Cấu hình Database
 ```bash
 # Tạo database PostgreSQL
@@ -114,10 +140,109 @@ createdb voice_assistant
 # Backend sẽ tự động tạo bảng khi chạy ở development mode
 ```
 
-## 🚀 Chạy ứng dụng
+## 🐳 Docker Deployment
 
-### Method 1: Chạy từng service riêng biệt
+### 🔧 Bước 1: Cấu hình Môi trường
 
+Tạo file môi trường từ file mẫu:
+```bash
+# Copy file môi trường
+cp .env.example .env
+
+# Chỉnh sửa các biến nhạy cảm
+nano .env  # hoặc dùng editor khác
+```
+
+**Các biến cần thay đổi:**
+```env
+# Database Configuration
+DB_PASSWORD=your_secure_password_here      # → Đặt password thật
+
+# JWT Configuration  
+JWT_SECRET=your_jwt_secret_key_here         # → Đặt secret thật
+
+# Weather API Configuration
+WEATHER_API_KEY=your_weather_api_key_here   # → Đặt API key thật
+
+# Ports (nếu cần thay đổi)
+FRONTEND_PORT=5173
+BACKEND_PORT=3000
+AI_SERVICES_PORT=5000
+OLLAMA_PORT=11434
+DB_PORT=5432
+REDIS_PORT=6379
+```
+
+### 🚀 Bước 2: Khởi động System
+
+**Option 1: Complete System (Khuyến nghị)**
+```bash
+# Build và start tất cả services
+docker-compose up -d --build
+
+# Xem logs
+docker-compose logs -f
+
+# Kiểm tra status
+docker-compose ps
+```
+
+**Option 2: Start từng service riêng**
+```bash
+# Chỉ frontend
+docker-compose up -d frontend
+
+# Chỉ backend + database + redis
+docker-compose up -d backend postgres redis
+
+# Chỉ AI services
+docker-compose up -d ai-services
+
+# Chỉ Ollama
+docker-compose up -d ollama ollama-init
+```
+
+### 🔍 Bước 3: Kiểm tra và Troubleshoot
+
+**Kiểm tra health status:**
+```bash
+# Xem tất cả containers
+docker-compose ps
+
+# Kiểm tra logs của specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f ai-services
+docker-compose logs -f ollama
+```
+
+**Các lệnh hữu ích:**
+```bash
+# Restart specific service
+docker-compose restart backend
+
+# Stop tất cả
+docker-compose down
+
+# Xóa volumes (cẩn thận!)
+docker-compose down -v
+
+# Rebuild specific service
+docker-compose up -d --build backend
+```
+
+### 📱 Bước 4: Truy cập Applications
+
+Sau khi khởi động thành công:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **AI Services**: http://localhost:5000
+- **Ollama LLM**: http://localhost:11434
+- **API Documentation**: http://localhost:3000/api-docs
+
+### 🛠️ Bước 5: Development Workflow
+
+**Để chạy local development:**
 ```bash
 # Terminal 1: AI Services
 cd ai-services
@@ -130,20 +255,24 @@ npm run dev
 # Terminal 3: Frontend
 cd frontend
 npm run dev
-```
 
-### Method 2: Chạy đồng thời (sử dụng concurrent hoặc npm-run-all)
-
-```bash
-# Cài đặt concurrently
-npm install -g concurrently
-
-# Chạy tất cả services
-concurrently "cd ai-services && python app.py" "cd backend && npm run dev" "cd frontend && npm run dev"
+# Terminal 4: Ollama (nếu cần)
+ollama serve
+ollama pull gemma3:4b
 ```
 
 ## 🌐 Truy cập ứng dụng
 
+Sau khi deploy thành công với Docker:
+
+### Production URLs
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **AI Services**: http://localhost:5000
+- **Ollama LLM**: http://localhost:11434
+- **API Documentation**: http://localhost:3000/api-docs
+
+### Local Development URLs
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **AI Services**: http://localhost:5000
@@ -195,6 +324,13 @@ npm run preview    # Preview production build
 
 # AI Services
 python app.py      # Start Flask server
+
+# Mobile App
+npm start          # Start Expo development server
+npm run android    # Start with Android emulator
+npm run ios         # Start with iOS simulator
+npm run web         # Start in web browser
+npm run lint        # Run ESLint
 ```
 
 ### Environment Variables
@@ -271,10 +407,36 @@ JWT_SECRET=production-secret-key
 CORS_ORIGIN=https://yourdomain.com
 ```
 
-### Docker (khuyến nghị)
-```dockerfile
-# Tạo Dockerfile cho từng service
-# Sử dụng docker-compose cho orchestration
+### Docker Deployment
+
+**Complete System với Docker Compose:**
+```bash
+# Start tất cả services
+docker-compose up -d --build
+
+# Xem status
+docker-compose ps
+
+# Scale services (nếu cần)
+docker-compose up -d --scale backend=2
+
+# Update services
+docker-compose pull && docker-compose up -d
+```
+
+**Individual Service Containers:**
+```bash
+# Frontend only
+docker-compose up -d frontend
+
+# Backend only
+docker-compose up -d backend postgres redis
+
+# AI Services only
+docker-compose up -d ai-services
+
+# Ollama only
+docker-compose up -d ollama ollama-init
 ```
 
 ## 🤝 Contributing
@@ -287,14 +449,15 @@ CORS_ORIGIN=https://yourdomain.com
 
 ## 📝 Todo List
 
-- [ ] Docker containerization
+- [x] Docker containerization
+- [x] Mobile app development (React Native/Expo)
 - [ ] Automated testing setup
 - [ ] CI/CD pipeline
 - [ ] Rate limiting implementation
 - [ ] Advanced error handling
 - [ ] Performance monitoring
 - [ ] Internationalization (i18n)
-- [ ] Mobile app development
+- [ ] Mobile app deployment
 
 ## 📄 License
 

@@ -4,6 +4,7 @@ import aiAvatar from "../../../assets/ai.gif";
 import userAvatar from "../../../assets/user.gif";
 
 export function VoiceChatModal({
+  avatarSrc,
   recording,
   speaking,
   busy,
@@ -11,7 +12,7 @@ export function VoiceChatModal({
   assistantLabel,
 }) {
   return (
-    <div className="w-full max-w-3xl">
+    <div className="w-full max-w-2xl">
       <div className="bg-gradient-to-b from-[#0a1628] to-[#030a1a] rounded-3xl border border-white/10 shadow-2xl p-10">
         {/* Header */}
         <div className="text-center mb-10">
@@ -95,7 +96,7 @@ export function VoiceChatModal({
               `}
             >
               <img
-                src={aiAvatar}
+                src={speaking ? aiAvatar : avatarSrc}
                 alt={assistantLabel}
                 className="w-full h-full object-cover"
               />

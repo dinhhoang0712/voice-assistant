@@ -182,6 +182,7 @@ export const PROFILE_QUERY_PATTERNS = [
       /.*tên.*trợ lý.*là.*gì.*/i,
       /.*tôi.*đặt.*tên.*bạn.*là.*gì.*/i,
       /.*bạn.*tên.*gì.*/i,
+      /tên bạn là gì.*/i,
     ],
     template: "Tên của tôi là {}.",
   },

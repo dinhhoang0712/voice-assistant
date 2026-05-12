@@ -44,10 +44,6 @@ export default function Customize2Page() {
         assistant_name: name,
         assistant_image: assistantImage,
       });
-<<<<<<< HEAD
-      setUserData(normalizeUser(data));
-      navigate("/");
-=======
       // DEBUG: In ra để xem cấu trúc dữ liệu trả về từ backend
       console.log("API response data:", data);
 
@@ -55,7 +51,6 @@ export default function Customize2Page() {
       // Nếu dữ liệu nằm ngay ở `data` thì giữ nguyên là normalizeUser(data)
       setUserData(normalizeUser(data.user || data));
       navigate("/chat");
->>>>>>> origin/thanhhoa
     } catch (error) {
       setErr(
         error.response?.data?.message ||

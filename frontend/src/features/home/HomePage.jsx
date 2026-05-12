@@ -5,7 +5,6 @@ import { useHomeAssistant } from "./useHomeAssistant";
 
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeDrawer } from "./components/HomeDrawer";
-import { HomeHero } from "./components/HomeHero";
 
 import { ReminderBanner } from "./components/ReminderBanner";
 import { ChatThread } from "./components/ChatThread";
@@ -47,10 +46,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-[#030a1a] via-[#0a1628] to-black text-white flex flex-col">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-[#030a1a] via-[#0a1628] to-black text-white flex flex-col w-screen max-w-screen isolate">
       {/* HEADER */}
       <HomeHeader
-        userName={userData?.name}
+        userName={userData?.name || userData?.profile?.name || userData?.username || "User"}
         avatarSrc={avatarSrc}
         onOpenDrawer={() => setDrawerOpen(true)}
         onCustomize={() => navigate("/customize")}
@@ -68,9 +67,9 @@ export default function HomePage() {
       />
 
       {/* MAIN */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden w-full min-w-0">
         {/* CENTER VOICE AREA */}
-        <div className="flex-1 relative flex flex-col items-center justify-center px-6">
+        <div className="flex-1 relative flex flex-col items-center justify-center px-4 sm:px-6 min-w-0 overflow-hidden">
           {/* Toggle chat button */}
           <button
             onClick={() => setChatOpen(!chatOpen)}
@@ -111,7 +110,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* HERO */}
+          {/* HERO
           <div className="mb-8">
             <HomeHero
               assistantLabel={assistantLabel}
@@ -120,10 +119,11 @@ export default function HomePage() {
               speaking={speaking}
               busy={busy}
             />
-          </div>
+          </div> */}
 
           {/* MAIN VOICE UI */}
           <VoiceChatModal
+            avatarSrc={avatarSrc}
             recording={recording}
             speaking={speaking}
             busy={busy}
@@ -136,8 +136,8 @@ export default function HomePage() {
         <div
           className={`
             transition-all duration-300 border-l border-white/10 bg-[#081120]
-            flex flex-col overflow-hidden
-            ${chatOpen ? "w-[420px] opacity-100" : "w-0 opacity-0"}
+            flex flex-col overflow-hidden flex-shrink-0
+            ${chatOpen ? "w-[280px] sm:w-[320px] md:w-[360px] opacity-100" : "w-0 opacity-0"}
           `}
         >
           {chatOpen && (
@@ -160,13 +160,8 @@ export default function HomePage() {
               </div>
 
               {/* CHAT THREAD */}
-<<<<<<< HEAD
-              <div className="flex-1 overflow-y-auto">
-                <ChatThread history={history} />
-              </div>
-=======
+
               <ChatThread history={history} />
->>>>>>> origin/thanhhoa
 
               {/* CHAT INPUT */}
               <div className="border-t border-white/10 p-3 shrink-0">

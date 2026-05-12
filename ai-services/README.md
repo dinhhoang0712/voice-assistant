@@ -78,9 +78,35 @@ ai-services/
 - **Chuyển đổi Văn bản thành Giọng nói**: Google Text-to-Speech (gTTS)
 - **Phân loại Ý định**: scikit-learn với TF-IDF + Logistic Regression
 - **Truy xuất FAQ**: Sentence Transformers (multilingual-e5-small)
-- **Ngôn ngữ**: Python
+- **Machine Learning**: PyTorch, Transformers, scikit-learn
+- **Audio Processing**: FFmpeg, librosa
+- **Ngôn ngữ**: Python 3.11
+
+## 🐳 Docker Configuration
+
+### Dockerfile Features
+
+- **Multi-stage build** cho tối ưu kích thước
+- **Python 3.11 slim base image**
+- **FFmpeg** cho xử lý audio
+- **Health check** để monitor service
+- **Production-ready configuration**
+
+### Docker Compose Services
+
+- **AI Services Container**: Flask app trên port 5000
+- **Volume mounts** cho models và data
+- **Health check** với automatic restart
+- **Network isolation** cho security
+
+### Environment Variables
+
+- `FLASK_ENV=production`: Production mode
+- `PYTHONPATH=/app`: Python path configuration
 
 ## Cài đặt
+
+### Local Development
 
 1. Clone repository:
 ```bash
@@ -90,7 +116,7 @@ cd ai-services
 
 2. Cài đặt dependencies:
 ```bash
-pip install flask faster-whisper gtts sentence-transformers scikit-learn pandas numpy joblib
+pip install -r requirements.txt
 ```
 
 3. Chuẩn bị mô hình:
@@ -102,7 +128,32 @@ python ml/train_intent.py
 python ml/build_faq_embeddings.py
 ```
 
+### Docker Deployment
+
+1. Build và chạy với Docker:
+```bash
+# Build image
+docker build -t voice-assistant-ai-services .
+
+# Run container
+docker run -p 5000:5000 voice-assistant-ai-services
+```
+
+2. Sử dụng Docker Compose:
+```bash
+# Start service
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop service
+docker-compose down
+```
+
 ## Sử dụng
+
+### Local Development
 
 1. Khởi động server:
 ```bash
@@ -110,6 +161,20 @@ python app.py
 ```
 
 2. Dịch vụ sẽ có sẵn tại `http://localhost:5000`
+
+### Docker
+
+1. Khởi động với Docker:
+```bash
+docker-compose up -d
+```
+
+2. Dịch vụ sẽ có sẵn tại `http://localhost:5000`
+
+3. Kiểm tra health:
+```bash
+curl http://localhost:5000
+```
 
 ## Cấu hình
 

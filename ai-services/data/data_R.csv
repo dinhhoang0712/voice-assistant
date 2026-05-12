@@ -449,6 +449,11 @@ Thêm lịch học lúc 6 giờ sáng mai,calendar
 Tôi thích làm việc theo deadline rõ ràng,personalize
 Tắt bluetooth,control_device
 Chạy powerpoint,control_device
+đặt lịch học ngày mai 6 giờ,calendar
+hủy lịch mai,calendar
+hủy lịch ngày mai,calendar
+thêm lịch mai dậy,calendar
+đặt lịch mai,calendar
 Thêm lịch ăn sáng lúc 7 giờ,calendar
 Sáng nay có lịch học không,calendar
 Thời tiết hôm nay thế nào,qa
@@ -1018,3 +1023,562 @@ Việt Nam có bao nhiêu tỉnh,qa
 Chiều thứ sáu tôi có hẹn không,calendar
 Gửi tin nhắn mới,control_device
 Tắt tiếng máy,control_device
+machine learning là gì,qa
+blockchain hoạt động sao,qa
+python dùng để làm gì,qa
+docker là gì vậy,qa
+ai khác machine learning chỗ nào,qa
+deep learning là gì,qa
+backend là gì,qa
+frontend là gì,qa
+api là gì,qa
+embedding là gì,qa
+vector database là gì,qa
+rag là gì,qa
+llm là gì,qa
+mô hình transformer là gì,qa
+whisper dùng để làm gì,qa
+fastapi là gì,qa
+websocket là gì,qa
+postgresql là gì,qa
+redis là gì,qa
+semantic search là gì,qa
+vì sao ai cần dữ liệu,qa
+gpu dùng để làm gì,qa
+cpu khác gpu thế nào,qa
+internet hoạt động sao,qa
+wifi là gì,qa
+linux là gì,qa
+ubuntu là gì,qa
+windows kernel là gì,qa
+học ai bắt đầu từ đâu,qa
+python khó không,qa
+cách học machine learning,qa
+supervised learning là gì,qa
+unsupervised learning là gì,qa
+nlp là gì,qa
+computer vision là gì,qa
+speech to text là gì,qa
+text to speech là gì,qa
+vì sao ai hallucination,qa
+prompt engineering là gì,qa
+vector là gì,qa
+cosine similarity là gì,qa
+sql là gì,qa
+mongodb là gì,qa
+docker compose là gì,qa
+virtualenv là gì,qa
+pip là gì,qa
+json là gì,qa
+csv là gì,qa
+http là gì,qa
+https là gì,qa
+jwt là gì,qa
+cookie là gì,qa
+session là gì,qa
+microservice là gì,qa
+monolithic là gì,qa
+oop là gì,qa
+python async là gì,qa
+thread là gì,qa
+process là gì,qa
+latency là gì,qa
+cache là gì,qa
+nginx là gì,qa
+server là gì,qa
+client server là gì,qa
+internet of things là gì,qa
+smart home là gì,qa
+edge ai là gì,qa
+openai là công ty gì,qa
+ollama dùng để làm gì,qa
+qwen là model gì,qa
+đặt lịch học ngày mai 6 giờ,calendar
+hủy lịch mai,calendar
+hủy lịch ngày mai,calendar
+thêm lịch mai dậy,calendar
+đặt lịch mai,calendar
+gemma là gì,qa
+llama là gì,qa
+vì sao embedding hữu ích,qa
+học data mining là gì,qa
+tiền xử lý dữ liệu là gì,qa
+noise data là gì,qa
+missing data là gì,qa
+feature engineering là gì,qa
+classification là gì,qa
+regression là gì,qa
+clustering là gì,qa
+recall precision là gì,qa
+f1 score là gì,qa
+accuracy là gì,qa
+ai agent là gì,qa
+multi agent là gì,qa
+mcp là gì,qa
+fine tuning là gì,qa
+quantization là gì,qa
+int8 là gì,qa
+fp16 là gì,qa
+cuda là gì,qa
+pytorch là gì,qa
+tensorflow là gì,qa
+sklearn là gì,qa
+sentence transformer là gì,qa
+bạn giải thích websocket đi,qa
+websocket realtime thế nào,qa
+streaming audio là gì,qa
+sự khác nhau polling websocket,qa
+vì sao websocket nhanh,qa
+stt nghĩa là gì,qa
+vad filtering là gì,qa
+beam search là gì,qa
+semantic retrieval là gì,qa
+knowledge base là gì,qa
+nhắc tôi họp lúc 8 giờ sáng,calendar
+mai có lịch gì không,calendar
+xóa lịch chiều nay,calendar
+đặt lịch học lúc 7h tối,calendar
+lịch ngày mai sao rồi,calendar
+chiều mai tôi có bận không,calendar
+hủy cái lịch mới tạo,calendar
+tạo lịch gym 6h sáng mai,calendar
+thêm lịch đi cà phê tối nay,calendar
+mai có cuộc họp nào không,calendar
+xem lịch hôm nay,calendar
+check lịch ngày mai,calendar
+đặt nhắc nhở uống thuốc 9h,calendar
+bỏ lịch họp chiều mai,calendar
+lên lịch học ai tối nay,calendar
+nhắc tôi ngủ sớm lúc 11h,calendar
+mai rảnh không,calendar
+hôm nay tôi có gì không,calendar
+xóa giúp tôi cái lịch tối qua,calendar
+đặt lịch sinh nhật mẹ chủ nhật,calendar
+thêm reminder họp team 8h,calendar
+cancel lịch tối nay,calendar
+show lịch ngày mai,calendar
+schedule cuộc họp lúc 10h,calendar
+remind tôi đi học mai 7h,calendar
+tôi thích màu xanh,personalize
+món ăn yêu thích của tôi là phở,personalize
+mình tên là cảnh,personalize
+tôi 21 tuổi,personalize
+tôi học ngành công nghệ thông tin,personalize
+tôi sống ở hà nội,personalize
+quê tôi ở nam định,personalize
+mình thích chơi game,personalize
+tôi làm ở fpt,personalize
+đồ uống yêu thích của tôi là trà sữa,personalize
+hãy trả lời ngắn gọn thôi,personalize
+nói tự nhiên thôi,personalize
+giải thích kỹ hơn nhé,personalize
+mình học ở hust,personalize
+tôi thích nghe nhạc lofi,personalize
+tôi thích ăn gà rán,personalize
+tôi tên cảnh nguyễn,personalize
+mình làm backend developer,personalize
+hãy nói lịch sự hơn,personalize
+đừng dài dòng quá,personalize
+mình ở hà đông,personalize
+sở thích của tôi là đọc sách,personalize
+mở youtube,control_device
+vào youtube đi,control_device
+open youtube,control_device
+mở facebook giúp tôi,control_device
+truy cập github,control_device
+mở gmail đi,control_device
+mở google calendar,control_device
+vào drive giúp tôi,control_device
+mở chatgpt,control_device
+mở gemini,control_device
+search machine learning,control_device
+tìm blockchain trên google,control_device
+google docker là gì,control_device
+tìm video python trên youtube,control_device
+mở youtube nhạc lofi,control_device
+search websocket fastapi,control_device
+mở stackoverflow,control_device
+mở docs,control_device
+mở google sheet,control_device
+vào instagram,control_device
+mở tiktok đi,control_device
+tìm AI agent,control_device
+youtube nhạc chill,control_device
+google semantic search,control_device
+youtube blockchain,control_device
+google machine learning,control_device
+open github,control_device
+chatgpt đi,control_device
+gmail giúp tôi,control_device
+mở du túp,control_device
+gô gồ machine learning,control_device
+mở git húp,control_device
+hệ điều hành dùng để làm gì,qa
+vì sao cần database,qa
+công dụng của docker là gì,qa
+mạng neural là gì,qa
+ai học từ dữ liệu kiểu gì,qa
+trí tuệ nhân tạo hoạt động sao,qa
+chatbot hoạt động như nào,qa
+vì sao llm trả lời được câu hỏi,qa
+mô hình ngôn ngữ lớn là gì,qa
+vì sao semantic search tốt hơn keyword search,qa
+embedding vector dùng để làm gì,qa
+cách hoạt động của cosine similarity,qa
+vì sao websocket phù hợp realtime,qa
+api restful là gì,qa
+cơ sở dữ liệu quan hệ là gì,qa
+vì sao nên dùng postgresql,qa
+deep neural network là gì,qa
+vì sao gpu mạnh cho ai,qa
+machine learning có cần toán không,qa
+docker giúp gì cho deploy,qa
+streaming realtime nghĩa là gì,qa
+vector search hoạt động ra sao,qa
+tại sao ai cần training data,qa
+mô hình ai học như thế nào,qa
+speech recognition là gì,qa
+text embedding là gì,qa
+vì sao ai đôi lúc trả lời sai,qa
+retrieval augmented generation là gì,qa
+transformer model hoạt động sao,qa
+python phổ biến vì sao,qa
+tạo lịch họp team lúc 9h sáng mai,calendar
+mai tôi có cuộc hẹn nào không,calendar
+xem giúp lịch ngày kia,calendar
+đặt nhắc nhở học bài tối nay,calendar
+xóa cuộc hẹn sáng mai,calendar
+thêm lịch ăn tối lúc 7h,calendar
+lịch tuần này của tôi thế nào,calendar
+hủy reminder vừa thêm,calendar
+check giúp tôi lịch tối nay,calendar
+đặt lịch call khách hàng 3h chiều,calendar
+ngày mai có lịch học không,calendar
+thêm lịch tập gym chiều mai,calendar
+xóa lịch đi chơi cuối tuần,calendar
+tạo reminder uống nước mỗi sáng,calendar
+tôi có bận tối mai không,calendar
+đặt lịch đi khám 8h sáng thứ 6,calendar
+show calendar hôm nay,calendar
+cancel cuộc họp ngày mai,calendar
+remind tôi ngủ lúc 12h,calendar
+thêm lịch làm assignment tối nay,calendar
+màu tôi thích nhất là đen,personalize
+tôi cực thích uống cà phê,personalize
+mình tên khánh,personalize
+tôi đang sống tại đà nẵng,personalize
+quê mình ở thái bình,personalize
+tôi học ở đại học bách khoa hà nội,personalize
+tôi thích xem phim khoa học viễn tưởng,personalize
+mình mê đá bóng,personalize
+tôi làm frontend developer,personalize
+đồ uống mình thích là coca,personalize
+hãy trả lời chi tiết hơn,personalize
+nói chuyện casual thôi,personalize
+đừng trả lời quá dài,personalize
+tôi thích coding ban đêm,personalize
+mình tên là minh anh,personalize
+tôi làm ở viettel,personalize
+món khoái khẩu của tôi là bún bò,personalize
+mình ở cầu giấy,personalize
+tôi thích nhạc chill,personalize
+nói chuyện formal hơn nhé,personalize
+mở netflix,control_device
+vào github giúp tôi,control_device
+open stackoverflow,control_device
+mở google drive,control_device
+truy cập messenger,control_device
+mở twitch đi,control_device
+search deep learning trên google,control_device
+youtube nhạc ngủ ngon,control_device
+google websocket python,control_device
+mở chatgpt giúp tôi,control_device
+vào tiktok luôn,control_device
+search blockchain tutorial,control_device
+mở docs google,control_device
+youtube học python cơ bản,control_device
+google fastapi websocket,control_device
+mở instagram đi,control_device
+vào gmail luôn,control_device
+open gemini,control_device
+search semantic retrieval,control_device
+mở lịch google calendar,control_device
+mai nhớ kêu tôi dậy lúc 6h,calendar
+tối nay tôi có gì cần làm không,calendar
+ngày mai xem giúp tôi có lịch gì,calendar
+chiều mai tôi có cuộc hẹn nào không,calendar
+thêm giúp tôi cái lịch học tối nay,calendar
+tạo reminder uống thuốc lúc 9h tối,calendar
+mai có phải họp không nhỉ,calendar
+đừng quên nhắc tôi học bài tối nay,calendar
+check xem mai tôi rảnh không,calendar
+đặt hộ tôi lịch họp sáng mai,calendar
+đặt lịch học ngày mai 6 giờ,calendar
+hủy lịch mai,calendar
+hủy lịch ngày mai,calendar
+thêm lịch mai dậy,calendar
+đặt lịch mai,calendar
+mai nhớ gọi tôi lúc 6h nha,calendar
+chiều nay tôi có lịch gì không,calendar
+thêm lịch học AI tối nay,calendar
+mai có cuộc họp nào không ta,calendar
+đặt lịch cafe với Long lúc 7h tối,calendar
+nhắc tôi uống nước sau 30 phút nữa,calendar
+check lịch giúp tôi với,calendar
+xóa cái lịch vừa tạo đi,calendar
+đặt reminder học ielts tối nay,calendar
+thứ 7 này có lịch gì không,calendar
+nhắc tôi nộp bài vào tối mai,calendar
+mai tôi rảnh lúc nào,calendar
+đặt lịch họp team sáng thứ 2,calendar
+show calendar hôm nay,calendar
+cuối tuần này có deadline gì không,calendar
+thêm lịch đi khám răng ngày mai,calendar
+8h tối nhớ nhắc tôi họp zoom,calendar
+tạo reminder đi ngủ sớm,calendar
+mai có phải đi học không nhỉ,calendar
+lịch tháng này còn trống không,calendar
+nhắc tôi gọi điện cho mẹ tối nay,calendar
+thêm lịch đi gym chiều mai,calendar
+sáng mai tôi có bận không,calendar
+đặt lịch ăn tối với khách hàng,calendar
+xem giúp tôi lịch ngày kia,calendar
+hủy lịch học tối nay đi,calendar
+nhắc tôi check mail lúc 9h sáng,calendar
+mai còn cuộc hẹn nào không,calendar
+lịch tuần sau như nào nhỉ,calendar
+đặt lịch làm assignment tối nay,calendar
+cho tôi xem các lịch sắp tới,calendar
+thêm reminder uống thuốc 8h tối,calendar
+chiều mai có họp không ta,calendar
+nhắc tôi đóng tiền điện cuối tháng,calendar
+mai có lịch thi không,calendar
+đặt lịch học nhóm lúc 2h chiều,calendar
+xóa reminder uống nước đi,calendar
+thêm lịch chạy bộ sáng mai,calendar
+hôm nay có việc gì quan trọng không,calendar
+check lịch tối nay giúp tôi,calendar
+
+mở youtube giúp tôi,control_device
+bật wifi lên đi,control_device
+restart máy tính hộ cái,control_device
+tắt bluetooth giúp mình,control_device
+mở spotify phát nhạc chill,control_device
+cho tôi vào gmail luôn,control_device
+mở chrome lẹ đi,control_device
+bật chế độ tối giúp tôi,control_device
+tắt nhạc ngay,control_device
+mở file explorer,control_device
+vào github giúp mình,control_device
+mở terminal lên,control_device
+tắt màn hình giúp tôi,control_device
+cho tôi search machine learning,control_device
+mở messenger đi,control_device
+bật hotspot điện thoại,control_device
+đóng hết tab chrome đi,control_device
+mở visual studio code,control_device
+vào netflix luôn,control_device
+giảm độ sáng xuống chút,control_device
+mở camera giúp tôi,control_device
+tắt wifi đi nha,control_device
+bật loa ngoài giúp tôi,control_device
+mở settings hệ thống,control_device
+mở google calendar,control_device
+vào drive giúp cái,control_device
+chụp màn hình luôn đi,control_device
+mở pycharm hộ mình,control_device
+tắt tất cả ứng dụng đang chạy,control_device
+mở task manager giúp tôi,control_device
+cho tôi vào facebook,control_device
+phát playlist yêu thích đi,control_device
+mở ứng dụng email,control_device
+vì sao semantic search thông minh hơn search thường,qa
+mai co lich gi ko,calendar
+mo ytb di,control_device
+toi thik nhac chill,personalize
+gpu la gi v,qa
+mở du túp nhạc lofi,control_device
+gô gồ machine learning,control_device
+nhắc tui học ai lúc 8 giờ tối,calendar
+tui thích code đêm,personalize
+mở youtube rồi phát nhạc chill luôn,control_device
+mai nhắc tôi họp rồi mở zoom giúp tôi,calendar
+mai có gì không,calendar
+tôi mệt quá,qa
+mở nó lên đi,control_device
+đặt lịch họp ở starbucks lúc 7h tối,calendar
+mở visual studio code,control_device
+tôi làm ở samsung,personalize
+postgresql có tốt hơn mysql không,qa
+mình khá hướng nội,personalize
+tôi thích làm việc một mình hơn,personalize
+mình thường học sau 10h tối,personalize
+tôi dễ buồn ngủ vào buổi chiều,personalize
+mình thích cafe yên tĩnh để học bài,personalize
+tôi không chịu được tiếng ồn lớn,personalize
+mình thích nghe piano khi code,personalize
+tôi hay procrastinate vào buổi tối,personalize
+mình thích setup bàn làm việc tối màu,personalize
+tôi thường quên uống nước,personalize
+mình đang cố cải thiện tiếng anh giao tiếp,personalize
+tôi thích câu trả lời ngắn thôi,personalize
+mình muốn assistant nói tự nhiên hơn,personalize
+tôi hay thức tới 2h sáng,personalize
+mình thích đi đường tránh đông xe,personalize
+tôi thường order đồ ăn khuya,personalize
+mình thích thời tiết lạnh hơn nóng,personalize
+tôi đang luyện speaking ielts mỗi ngày,personalize
+mình không thích thông báo quá nhiều,personalize
+tôi thích nhạc không lời lúc làm việc,personalize
+
+vì sao websocket phù hợp voice assistant,qa
+llm tạo câu trả lời bằng cách nào,qa
+embedding giúp semantic search ra sao,qa
+vì sao transformer xử lý ngôn ngữ tốt vậy,qa
+cache redis giúp tăng tốc kiểu gì,qa
+sự khác nhau giữa thread với process là gì,qa
+vì sao docker nhẹ hơn virtual machine,qa
+gpu train ai nhanh hơn cpu bao nhiêu,qa
+postgresql có hỗ trợ vector search không,qa
+rag có cần fine tuning không,qa
+whisper nhận diện giọng nói kiểu gì,qa
+streaming realtime hoạt động ra sao,qa
+vì sao websocket không cần polling liên tục,qa
+fastapi async có lợi gì,qa
+vector database lưu dữ liệu như thế nào,qa
+semantic retrieval khác database search thường sao,qa
+vì sao cosine similarity đo độ giống được,qa
+llm hallucination là gì vậy,qa
+api gateway dùng để làm gì,qa
+microservice khó hơn monolithic ở đâu,qa
+qwen với llama khác nhau thế nào,qa
+websocket là gì vậy,qa
+vì sao ai cần dữ liệu nhiều thế,qa
+gpu khác cpu ở điểm nào,qa
+machine learning hoạt động sao,qa
+rag là gì thế,qa
+embedding vector dùng để làm gì,qa
+python có dễ học không,qa
+api restful là gì,qa
+docker giúp gì cho deploy,qa
+semantic search khác keyword search thế nào,qa
+transformer model hoạt động ra sao,qa
+backend với frontend khác gì nhau,qa
+tại sao websocket realtime hơn http,qa
+postgresql có ưu điểm gì,qa
+llm là viết tắt của gì,qa
+fine tuning nghĩa là sao,qa
+vì sao gpu phù hợp train ai,qa
+speech to text là gì,qa
+json dùng để làm gì,qa
+redis hoạt động kiểu gì,qa
+linux là gì vậy,qa
+ubuntu khác windows thế nào,qa
+vector database là gì,qa
+prompt engineering nghĩa là gì,qa
+chatbot hiểu câu hỏi kiểu gì,qa
+cpu với gpu cái nào mạnh hơn,qa
+cache dùng để làm gì,qa
+server là gì vậy,qa
+internet hoạt động như thế nào,qa
+docker compose có tác dụng gì,qa
+vì sao ai đôi lúc trả lời sai,qa
+semantic retrieval là gì,qa
+mcp là gì trong ai agent,qa
+fastapi dùng để làm gì,qa
+websocket stream audio kiểu gì,qa
+deep learning khác machine learning sao,qa
+nlp là gì thế,qa
+computer vision dùng để làm gì,qa
+vì sao cosine similarity hữu ích,qa
+http và https khác nhau sao,qa
+
+mai co lich gi ko,calendar
+nho toi hoc bai luc 8h toi nha,calendar
+check lich dum toi voi,calendar
+xoa cai reminder hoi nay di,calendar
+mai ranh ko ta,calendar
+mo ytb di,control_device
+bat wf giup toi,control_device
+tat nhac di,control_device
+mo github len,control_device
+restart may dum cai,control_device
+toi thik nhac chill,personalize
+minh hay code dem,personalize
+toi ko an cay dc,personalize
+minh thik dark mode,personalize
+gpu la gi v,qa
+api la gi z,qa
+mai nhớ gọi tôi dậy nha chứ tôi sợ ngủ quên,calendar
+đặt lịch học dùm cái tối nay 8h,calendar
+lịch mai có kín không vậy,calendar
+hủy cái lịch hồi chiều đi giúp tôi,calendar
+mai tôi có phải lên trường không ta,calendar
+
+mở nhạc chill chill tí đi,control_device
+bật wf lại xem mạng lag quá,control_device
+mở gúc gồ chrome giúp tui,control_device
+vào du túp phát nhạc học bài đi,control_device
+search cách fix docker error,control_device
+
+mình mê công nghệ lắm,personalize
+tôi cực thích backend luôn,personalize
+mình học dễ vào buổi đêm hơn,personalize
+tôi ghét bị spam notification,personalize
+mình thích ngồi góc yên tĩnh học bài,personalize
+
+ai agent khác chatbot chỗ nào,qa
+backend dev thường làm gì,qa
+frontend với ui ux khác nhau sao,qa
+websocket có dùng cho game realtime được không,qa
+vector embedding tạo như thế nào,qa
+
+anh ơi mở youtube giúp em với,control_device
+chị ơi nhắc em mai nộp bài nha,calendar
+máy lag quá restart giúp mình cái,control_device
+mai có lịch học xác suất không ta,calendar
+mình thích assistant nói chuyện casual thôi,personalize
+
+thêm lịch ăn lẩu với team cuối tuần,calendar
+đặt lịch đi cf học nhóm tối mai,calendar
+mai có lịch phỏng vấn không nhỉ,calendar
+nhắc tôi checkout github contribution tối nay,calendar
+schedule demo project thứ 6 giúp tôi,calendar
+
+mở github repo backend,control_device
+search how to learn ai agent,control_device
+mở youtube coding music,control_device
+vào google docs giúp tôi,control_device
+mở app camera laptop,control_device
+
+mình thích làm việc có deadline rõ ràng,personalize
+tôi thường tập trung tốt sau 9h tối,personalize
+mình đang tập sống healthy hơn,personalize
+tôi thích assistant trả lời giống người thật,personalize
+mình không thích nói chuyện quá formal,personalize
+
+vì sao ai model cần gpu mạnh,qa
+cuda dùng để tăng tốc kiểu gì,qa
+speech to text khác text to speech sao,qa
+ollama dùng để chạy model local à,qa
+qwen với llama khác nhau thế nào,qa
+xe điện đi trời mưa có an toàn không,qa
+vì sao điện thoại nóng lên khi chơi game,qa
+pin lithium hoạt động như thế nào,qa
+sao ngủ ít lại đau đầu,qa
+ăn khuya có ảnh hưởng gì không,qa
+vì sao uống cà phê tối dễ mất ngủ,qa
+não bộ ghi nhớ thông tin kiểu gì,qa
+vì sao học bằng hình ảnh dễ nhớ hơn,qa
+mưa axit hình thành như thế nào,qa
+vì sao trời nồm làm sàn nhà ướt,qa
+camera điện thoại lấy nét kiểu gì,qa
+sao tai nghe bluetooth có độ trễ,qa
+wifi 5ghz khác gì 2.4ghz,qa
+vì sao pin iphone chai theo thời gian,qa
+sao mở nhiều tab chrome lại tốn ram,qa
+đi bộ mỗi ngày có lợi gì cho tim mạch,qa
+vì sao stress làm khó ngủ,qa
+uống nước ngay sau khi ngủ dậy có tốt không,qa
+vì sao con người cần vitamin c,qa
+tôi thường nghe white noise để ngủ,personalize

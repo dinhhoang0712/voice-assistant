@@ -28,7 +28,7 @@ def transcribe():
     audio = request.files["audio"]
 
     text = speech_to_text(audio)
-
+    print("text----------:", text)
     return jsonify({
         "success": True,
         "text": text

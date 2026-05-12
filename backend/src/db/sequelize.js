@@ -15,7 +15,7 @@ async function connectDb() {
   await sequelize.authenticate();
   // đảm bảo bảng/columns tồn tại trong dev; có thể tắt trong production nếu bạn dùng migration
   if (env.nodeEnv !== "production") {
-    await sequelize.sync({ alter: true });
+    sequelize.sync();
   }
 }
 

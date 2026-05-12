@@ -5,7 +5,6 @@ import { api, paths } from "../../services/http";
 import { useReminderSocket } from "../../hooks/useReminderSocket";
 import { runAssistantAction } from "../../lib/assistant";
 import { getApiErrorMessage } from "../../lib/apiError";
-import { socket } from "../../socket/socket";
 
 export function useHomeAssistant() {
   const { userData, logout } = useContext(userDataContext);
@@ -19,6 +18,7 @@ export function useHomeAssistant() {
   const [error, setError] = useState("");
   const [reminderToast, setReminderToast] = useState(null);
   const [ackLoading, setAckLoading] = useState(false);
+  const chunksRef = useRef([]);
   const streamRef = useRef(null);
   const stopRecording = useRef(null);
 
@@ -37,22 +37,6 @@ export function useHomeAssistant() {
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
-
-  useEffect(() => {
-    socket.on("transcript:partial", (data) => {
-      console.log("PARTIAL:", data.text);
-    });
-
-    socket.on("transcript:final", (data) => {
-      console.log("FINAL:", data.text);
-    });
-
-    return () => {
-      socket.off("transcript:partial");
-
-      socket.off("transcript:final");
-    };
-  }, []);
 
   useReminderSocket(userData?.id, (payload) => {
     setReminderToast({
@@ -132,57 +116,48 @@ export function useHomeAssistant() {
 
   const startRecording = async () => {
     if (recording || busy) return;
-
     setError("");
-
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-
       const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
         ? "audio/webm;codecs=opus"
         : "audio/webm";
-
-      const rec = new MediaRecorder(stream, {
-        mimeType: mime,
-      });
-
-      socket.emit("voice:start");
-
-      rec.ondataavailable = async (e) => {
-        if (e.data.size > 0) {
-          const arrayBuffer = await e.data.arrayBuffer();
-
-          socket.emit("voice:chunk", arrayBuffer);
-        }
+      const rec = new MediaRecorder(stream, { mimeType: mime });
+      chunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
       };
-
-      rec.onstop = () => {
+      rec.onstop = async () => {
         stream.getTracks().forEach((tr) => tr.stop());
-
         streamRef.current = null;
-
         setRecording(false);
-
-        socket.emit("voice:end");
-      };
-
-      // realtime chunk
-      rec.start(250);
-
-      setRecording(true);
-
-      stopRecording.current = () => {
-        if (rec.state === "recording") {
-          rec.stop();
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        if (blob.size < 200) {
+          setError("Bản ghi quá ngắn. Thử nói rõ hơn.");
+          return;
         }
+        setBusy(true);
+        try {
+          const form = new FormData();
+          form.append("audio", blob, "recording.webm");
+          const { data } = await api.post(paths.assistant.voiceChat, form);
+          runAssistantAction(data.action);
+          await loadHistory();
+          await playReplyAudio(data.reply);
+        } catch (e) {
+          setError(getApiErrorMessage(e, "Không xử lý được giọng nói."));
+        } finally {
+          setBusy(false);
+        }
+      };
+      rec.start(200);
+      setRecording(true);
+      stopRecording.current = () => {
+        if (rec.state === "recording") rec.stop();
       };
     } catch {
-      setError("Trình duyệt từ chối micro.");
-
+      setError("Trình duyệt từ chối micro hoặc không hỗ trợ ghi âm.");
       setRecording(false);
     }
   };

@@ -14,10 +14,10 @@ import { protectedRoute } from "./middleware/authMiddleware.js";
 import { assistantRouter } from "./routes/assistantRouter.js";
 import reminderRoutes from "./routes/reminderRoutes.js";
 import { initializeSocketHandlers } from "./socket/index.js";
-import reminderWorker from "./workers/reminderWorker.js";
 import { historyRouter } from "./routes/historyRouter.js";
 import { userRouter } from "./routes/userRouter.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import "./workers/reminderWorker.js";
 
 const app = express();
 const server = createServer(app);
@@ -83,9 +83,6 @@ app.use(errorHandler);
 connectDb().then(() => {
   // Initialize Socket.IO handlers
   initializeSocketHandlers(io);
-
-  // Start reminder worker
-  reminderWorker.start();
 
   server.listen(PORT, () => {
     console.log(`Server bắt đầu trên cổng ${PORT}`);

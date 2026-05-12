@@ -19,6 +19,8 @@ Backend API cho ứng dụng trợ lý ảo giọng nói được xây dựng v�
 - **Socket.IO** - Real-time communication
 - **Sequelize** - ORM cho PostgreSQL
 - **PostgreSQL** - Database
+- **Redis** - In-memory data store cho queue system
+- **BullMQ** - Queue system cho background jobs
 - **JWT** - Authentication tokens
 - **Multer** - File upload handling
 - **Helmet** - Security headers
@@ -48,6 +50,10 @@ NODE_ENV=development
 # Database
 DATABASE_URL=postgresql://username:password@localhost:5432/voice_assistant
 
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
 # JWT
 JWT_SECRET=your-secret-key-here
 
@@ -62,6 +68,15 @@ CORS_ORIGIN=http://localhost:3000
 ```bash
 # Tạo database PostgreSQL
 createdb voice_assistant
+
+# Cài đặt và chạy Redis (cho BullMQ)
+# Ubuntu/Debian:
+sudo apt-get install redis-server
+sudo systemctl start redis
+
+# macOS:
+brew install redis
+brew services start redis
 
 # Khi chạy ở development mode, Sequelize sẽ tự động tạo bảng theo models
 NODE_ENV=development npm run dev
@@ -122,8 +137,16 @@ Authorization: Bearer <your-jwt-token>
 Sử dụng Socket.IO cho real-time communication:
 
 - **Connection events** - Khi người dùng kết nối/ngắt kết nối
-- **Reminder notifications** - Thông báo nhắc nhở real-time
+- **Reminder notifications** - Thông báo nhắc nhở real-time (qua BullMQ)
 - **Assistant responses** - Phản hồi từ trợ lý ảo
+
+## 📋 Queue System (BullMQ + Redis)
+
+Hệ thống queue sử dụng BullMQ và Redis để xử lý background jobs:
+
+- **Reminder Queue** - Xử lý và gửi thông báo nhắc nhở
+- **Worker Process** - Chạy background jobs để gửi notifications qua Socket.IO
+- **Redis Connection** - Cấu hình Redis tại `src/config/redis.js`
 
 ## 📁 Cấu trúc dự án
 
@@ -137,7 +160,9 @@ src/
 ├── services/       # Business logic
 ├── socket/         # Socket.IO handlers
 ├── utils/          # Utility functions
-├── workers/        # Background jobs
+├── workers/        # Background jobs (BullMQ)
+├── queues/         # Queue definitions (BullMQ)
+├── config/         # Configuration files (Redis, etc.)
 ├── db/            # Database configuration
 └── server.js      # Entry point
 ```
@@ -182,11 +207,12 @@ Documentation bao gồm:
 ## �📝 Todo
 
 - [x] Add API documentation (Swagger)
+- [x] Implement Redis + BullMQ queue system
+- [x] Docker containerization
 - [ ] Implement rate limiting
 - [ ] Add input validation middleware
 - [ ] Setup automated testing
 - [ ] Add monitoring and logging
-- [ ] Docker containerization
 
 ## 🤝 Contributing
 

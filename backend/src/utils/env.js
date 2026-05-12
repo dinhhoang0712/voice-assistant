@@ -31,4 +31,6 @@ export const env = {
   LLM_MODEL: process.env.LLM_MODEL || "google/gemma-3-4b",
   weatherApiKey: optional("WEATHER_API_KEY"),
   weatherCity: process.env.WEATHER_CITY || "Hanoi",
+  redisHost: process.env.REDIS_HOST || "localhost",
+  redisPort: Number(process.env.REDIS_PORT || 6379),
 };
