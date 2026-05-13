@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  ai-services:
+    build: .
+    container_name: voice-assistant-ai-services
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ai_temp:/app/temp
+    networks:
+      - voice-assistant-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  ai_temp:
+
+networks:
+  voice-assistant-network:
+    driver: bridge
