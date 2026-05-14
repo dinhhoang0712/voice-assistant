@@ -64,11 +64,6 @@ temp/
 *.tmp
 *.temp
 
-# Models that can be rebuilt
-models/*.pkl
-models/*.npy
-models/*.json
-
 # Data files
 data/*.csv
 data/*.json

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   ai-services:
@@ -17,14 +17,60 @@ services:
       - voice-assistant-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:5000')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+  ollama:
+    image: ollama/ollama:latest
+    container_name: voice-assistant-ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - voice-assistant-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: voice-assistant-ollama-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - LLM_MODEL=llama3.2:3b
+    entrypoint: >
+      sh -c "
+        echo 'Pulling model...' &&
+        ollama pull ${LLM_MODEL} &&
+        echo 'Model downloaded successfully'
+      "
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - voice-assistant-network
+    restart: "no"
 
 volumes:
   ai_temp:
+  ollama_data:
+  whisper_cache:
 
 networks:
   voice-assistant-network:

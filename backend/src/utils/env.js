@@ -27,10 +27,12 @@ export const env = {
   jwtSecret:
     optional("JWT_SECRET", "ACCESS_TOKEN_SECRET") || required("JWT_SECRET"),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
-  LLM_URL: process.env.LLM_URL || "http://127.0.0.1:1234/v1/chat/completions",
-  LLM_MODEL: process.env.LLM_MODEL || "google/gemma-3-4b",
+  LLM_URL:
+    process.env.LLM_URL || "https://api.groq.com/openai/v1/chat/completions",
+  LLM_MODEL: process.env.LLM_MODEL || "llama3-8b-8192",
   weatherApiKey: optional("WEATHER_API_KEY"),
   weatherCity: process.env.WEATHER_CITY || "Hanoi",
   redisHost: process.env.REDIS_HOST || "localhost",
   redisPort: Number(process.env.REDIS_PORT || 6379),
+  groqApiKey: process.env.GROQ_API_KEY || required("GROQ_API_KEY"),
 };

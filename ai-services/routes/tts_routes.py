@@ -1,5 +1,3 @@
-import os
-
 from flask import Blueprint
 from flask import request
 from flask import jsonify
@@ -32,17 +30,11 @@ def speak():
             "message": "Text is required"
         }), 400
 
-    audio_path = text_to_speech(text)
+    audio_buffer = text_to_speech(text)
 
-    response = send_file(
-        audio_path,
-        mimetype="audio/mpeg"
+    return send_file(
+        audio_buffer,
+        mimetype="audio/mpeg",
+        as_attachment=False,
+        download_name="speech.mp3"
     )
-
-    @response.call_on_close
-    def cleanup():
-
-        if os.path.exists(audio_path):
-            os.remove(audio_path)
-
-    return response
