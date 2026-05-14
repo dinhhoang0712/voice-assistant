@@ -146,7 +146,6 @@ ${text}
     console.log("--------------------------", output);
     return cleanLlmOutput(output) || "Tôi chưa thể trả lời lúc này.";
   } catch (err) {
-    console.log("LLM Raw Output:", env.groqApiKey);
     console.error("LLM Error:", err);
     return "Đã xảy ra lỗi khi gọi AI.";
   }

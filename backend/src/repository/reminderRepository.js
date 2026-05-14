@@ -24,7 +24,11 @@ export async function findPendingReminderById(userId, id) {
   });
 }
 
-export async function findPendingRemindersByTitleLike(userId, titleLike, { limit = 10 } = {}) {
+export async function findPendingRemindersByTitleLike(
+  userId,
+  titleLike,
+  { limit = 10 } = {},
+) {
   // Use iLike for Postgres; fallback to LIKE.
   const where = {
     userId,
@@ -56,14 +60,14 @@ export async function updatePendingReminder(userId, id, fields) {
   return count;
 }
 
-export async function findDueReminders(currentTime) {
+export async function findDueReminders(userId, currentTime) {
   return await Reminder.findAll({
     where: {
+      userId,
       status: "pending",
       reminderTime: {
         [Op.lte]: currentTime,
       },
-      notified: false,
     },
     order: [["reminderTime", "ASC"]],
   });
@@ -78,7 +82,7 @@ export async function markReminderAsNotified(id) {
         status: "pending",
         notified: false,
       },
-    }
+    },
   );
 
   return updatedCount > 0;
@@ -93,7 +97,7 @@ export async function markReminderAsDone(userId, id) {
         userId,
         status: "pending",
       },
-    }
+    },
   );
 
   return updatedCount > 0;

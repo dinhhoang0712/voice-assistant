@@ -97,7 +97,8 @@ assistantRouter.post("/voice-chat", upload.single("audio"), voiceChat);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-assistantRouter.post("/speak", speak);
+
+assistantRouter.route("/speak").get(speak).post(speak);
 
 /**
  * @swagger

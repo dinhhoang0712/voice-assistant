@@ -30,6 +30,7 @@ export const env = {
   LLM_URL:
     process.env.LLM_URL || "https://api.groq.com/openai/v1/chat/completions",
   LLM_MODEL: process.env.LLM_MODEL || "llama3-8b-8192",
+
   weatherApiKey: optional("WEATHER_API_KEY"),
   weatherCity: process.env.WEATHER_CITY || "Hanoi",
   redisHost: process.env.REDIS_HOST || "localhost",

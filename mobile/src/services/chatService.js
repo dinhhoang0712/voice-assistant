@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { Platform } from 'react-native';
-import BASE_URL from './apiConfig';
+import axios from "axios";
+import { Platform } from "react-native";
+import BASE_URL from "./apiConfig";
 
 const API_URL = `${BASE_URL}/api/assistant`;
 
@@ -9,19 +9,22 @@ const chatService = {
     try {
       const response = await axios.post(
         `${API_URL}/chat`,
-        { message },
+
+        { message, platform: "mobile" },
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       return response.data;
     } catch (error) {
       if (error.response) {
         throw error.response.data;
       }
-      throw { message: 'Không thể kết nối tới Server' };
+
+      throw { message: "Không thể kết nối tới Server" };
     }
   },
 
@@ -30,32 +33,34 @@ const chatService = {
       const formData = new FormData();
 
       // Xử lý URI cho Android (cần prefix file:// nếu chưa có)
-      const uri = Platform.OS === 'android' && !audioUri.startsWith('file://')
-        ? `file://${audioUri}`
-        : audioUri;
 
-      formData.append('audio', {
+      const uri =
+        Platform.OS === "android" && !audioUri.startsWith("file://")
+          ? `file://${audioUri}`
+          : audioUri;
+
+      formData.append("audio", {
         uri: uri,
-        type: 'audio/m4a',
-        name: 'audio.m4a',
+        type: "audio/m4a",
+        name: "audio.m4a",
       });
 
-      const response = await axios.post(
-        `${API_URL}/voice-chat`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      formData.append("platform", "mobile");
+
+      const response = await axios.post(`${API_URL}/voice-chat`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       return response.data;
     } catch (error) {
       if (error.response) {
         throw error.response.data;
       }
-      throw { message: 'Không thể xử lý giọng nói' };
+
+      throw { message: "Không thể xử lý giọng nói" };
     }
   },
 
@@ -75,7 +80,34 @@ const chatService = {
       if (error.response) {
         throw error.response.data;
       }
-      throw { message: 'Không thể tải lịch sử trò chuyện' };
+
+      throw { message: "Không thể tải lịch sử trò chuyện" };
+    }
+  },
+
+  checkDueReminders: async (token) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/reminders/due`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      return [];
+    }
+  },
+
+  acknowledgeReminder: async (id, token) => {
+    try {
+      await axios.post(
+        `${BASE_URL}/api/reminders/${id}/acknowledge`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return true;
+    } catch (error) {
+      return false;
     }
   },
 };

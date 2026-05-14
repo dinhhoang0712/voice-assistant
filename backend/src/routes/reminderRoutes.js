@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { protectedRoute } from "../middleware/authMiddleware.js";
-import { markReminderAsDone } from "../repository/reminderRepository.js";
+import {
+  markReminderAsDone,
+  findDueReminders,
+} from "../repository/reminderRepository.js";
 
 const router = Router();
 
@@ -59,6 +62,38 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+
+/**
+ * @swagger
+ * /api/reminders/due:
+ *   get:
+ *     summary: Lấy danh sách nhắc nhở đến hạn
+ *     tags: [Reminders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách nhắc nhở
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Reminder'
+ */
+router.get("/due", protectedRoute, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Tìm các nhắc nhở đến hạn của riêng user này
+    const reminders = await findDueReminders(userId, new Date());
+
+    return res.json(reminders);
+  } catch (error) {
+    console.error("Error fetching due reminders:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+});
+
 // Mark reminder as done (acknowledge notification)
 router.post("/:id/acknowledge", protectedRoute, async (req, res) => {
   try {

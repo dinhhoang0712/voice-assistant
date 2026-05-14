@@ -17,6 +17,8 @@ export const upload = multer({
       "video/webm",
       "audio/mp4",
       "audio/ogg",
+      "audio/m4a",
+      "audio/x-m4a",
     ];
     const base = (file.mimetype || "").split(";")[0].trim().toLowerCase();
 

@@ -30,6 +30,7 @@ def speak():
             "message": "Text is required"
         }), 400
 
+
     audio_buffer = text_to_speech(text)
 
     return send_file(
@@ -38,3 +39,4 @@ def speak():
         as_attachment=False,
         download_name="speech.mp3"
     )
+

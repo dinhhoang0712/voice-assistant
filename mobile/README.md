@@ -1,4 +1,6 @@
-# Voice Assistant Mobile App 
+<<<<<<< HEAD
+
+# Voice Assistant Mobile App
 
 Ứng dụng di động cho Voice Assistant được xây dựng với React Native và Expo, hỗ trợ voice chat và real-time communication.
 
@@ -186,10 +188,11 @@ EXPO_PUBLIC_SOCKET_URL=https://your-socket-domain.com
 
 ```typescript
 // services/api.ts
-import axios from 'axios';
-import Constants from 'expo-constants';
+import axios from "axios";
+import Constants from "expo-constants";
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
+const API_BASE_URL =
+  Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -201,14 +204,15 @@ export const api = axios.create({
 
 ```typescript
 // services/socket.ts
-import { io, Socket } from 'socket.io-client';
-import Constants from 'expo-constants';
+import { io, Socket } from "socket.io-client";
+import Constants from "expo-constants";
 
-const SOCKET_URL = Constants.expoConfig?.extra?.socketUrl || process.env.EXPO_PUBLIC_SOCKET_URL;
+const SOCKET_URL =
+  Constants.expoConfig?.extra?.socketUrl || process.env.EXPO_PUBLIC_SOCKET_URL;
 
 export const connectSocket = (): Socket => {
   return io(SOCKET_URL, {
-    transports: ['websocket'],
+    transports: ["websocket"],
   });
 };
 ```
@@ -219,8 +223,8 @@ export const connectSocket = (): Socket => {
 
 ```typescript
 // services/audio.ts
-import * as FileSystem from 'expo-file-system';
-import * as Audio from 'expo-av';
+import * as FileSystem from "expo-file-system";
+import * as Audio from "expo-av";
 
 export const startRecording = async () => {
   try {
@@ -229,15 +233,15 @@ export const startRecording = async () => {
       allowsRecordingIOS: true,
       playsInSilentModeIOS: true,
     });
-    
+
     const { recording } = await Audio.Recording.createAsync(
-      Audio.RecordingOptionsPresets.HIGH_QUALITY
+      Audio.RecordingOptionsPresets.HIGH_QUALITY,
     );
-    
+
     await recording.startAsync();
     return recording;
   } catch (error) {
-    console.error('Failed to start recording:', error);
+    console.error("Failed to start recording:", error);
   }
 };
 ```
@@ -246,19 +250,19 @@ export const startRecording = async () => {
 
 ```typescript
 // services/audio.ts
-import { Audio } from 'expo-av';
+import { Audio } from "expo-av";
 
 export const playAudio = async (uri: string) => {
   try {
     const { sound } = await Audio.Sound.createAsync(
       { uri },
-      { shouldPlay: true }
+      { shouldPlay: true },
     );
-    
+
     await sound.setPositionAsync(0);
     return sound;
   } catch (error) {
-    console.error('Failed to play audio:', error);
+    console.error("Failed to play audio:", error);
   }
 };
 ```
@@ -269,15 +273,15 @@ export const playAudio = async (uri: string) => {
 
 ```typescript
 // services/auth.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const TOKEN_KEY = 'auth_token';
+const TOKEN_KEY = "auth_token";
 
 export const storeToken = async (token: string) => {
   try {
     await AsyncStorage.setItem(TOKEN_KEY, token);
   } catch (error) {
-    console.error('Failed to store token:', error);
+    console.error("Failed to store token:", error);
   }
 };
 
@@ -285,7 +289,7 @@ export const getToken = async () => {
   try {
     return await AsyncStorage.getItem(TOKEN_KEY);
   } catch (error) {
-    console.error('Failed to get token:', error);
+    console.error("Failed to get token:", error);
     return null;
   }
 };
@@ -389,7 +393,7 @@ export const validateInput = (input: string): boolean => {
 
 export const sanitizeInput = (input: string): string => {
   // Remove potentially harmful content
-  return input.replace(/<script[^>]*>.*?<\/script>/gi, '');
+  return input.replace(/<script[^>]*>.*?<\/script>/gi, "");
 };
 ```
 
@@ -398,28 +402,34 @@ export const sanitizeInput = (input: string): string => {
 ### Common Issues
 
 1. **Metro bundler issues**:
+
    ```bash
    # Clear cache
    npx expo start -c
-   
+
    # Reset project
    npm run reset-project
    ```
 
 2. **Audio permission issues**:
+
    ```typescript
    // Request permissions properly
    const { status } = await Audio.requestPermissionsAsync();
-   if (status !== 'granted') {
-     Alert.alert('Permission required', 'Microphone access needed for voice chat');
+   if (status !== "granted") {
+     Alert.alert(
+       "Permission required",
+       "Microphone access needed for voice chat",
+     );
    }
    ```
 
 3. **Network issues**:
+
    ```bash
    # Check API connectivity
    curl http://localhost:3000/health
-   
+
    # Test Socket.IO connection
    npx expo start --tunnel
    ```
@@ -469,7 +479,7 @@ export const optimizeAudioBuffer = (buffer: ArrayBuffer): ArrayBuffer => {
   // Downsample if needed
   const sampleRate = 44100;
   const channels = 1;
-  
+
   // Implementation for audio optimization
   return buffer;
 };
@@ -523,18 +533,18 @@ export interface ChatMessage {
 
 export const sendMessage = async (message: string, audioFile?: File) => {
   const formData = new FormData();
-  formData.append('message', message);
-  
+  formData.append("message", message);
+
   if (audioFile) {
-    formData.append('audio', audioFile);
+    formData.append("audio", audioFile);
   }
-  
-  const response = await api.post('/api/assistant/chat', formData, {
+
+  const response = await api.post("/api/assistant/chat", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
-  
+
   return response.data;
 };
 ```
