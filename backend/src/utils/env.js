@@ -21,7 +21,7 @@ export const env = {
   aiServiceBaseUrl: optional("AI_SERVICE_BASE_URL") || "http://localhost:5000",
   dbUser: required("DB_USER"),
   dbPassword: required("DB_PASSWORD"),
-  dbHost: required("DB_HOST"),
+  dbHost: required("DB_HOST") || "localhost",
   dbPort: Number(required("DB_PORT")),
   dbName: required("DB_NAME"),
   jwtSecret:

@@ -1,23 +1,25 @@
-version: '3.8'
-
 services:
-  # Frontend Service (React + Nginx)
+  # =========================
+  # FRONTEND
+  # =========================
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: voice-assistant-frontend
     ports:
-      - "${FRONTEND_PORT:-5173}:80"
-    environment:
-      - NODE_ENV=production
+      - "${FRONTEND_PORT:-80}:80"
+    env_file:
+      - ./frontend/.env
     depends_on:
       - backend
+    restart: unless-stopped
     networks:
       - voice-assistant-network
-    restart: unless-stopped
 
-  # Backend Service (Node.js + Express)
+  # =========================
+  # BACKEND
+  # =========================
   backend:
     build:
       context: ./backend
@@ -25,147 +27,117 @@ services:
     container_name: voice-assistant-backend
     ports:
       - "${BACKEND_PORT:-3000}:3000"
+
     env_file:
       - ./backend/.env
+
     environment:
-      - NODE_ENV=production
-      - PORT=${BACKEND_PORT:-3000}
-      - CLIENT_URL=http://localhost:${FRONTEND_PORT:-5173}
-      - DB_USER=${DB_USER:-admin}
-      - DB_PASSWORD=${DB_PASSWORD:-071205}
-      - DB_HOST=postgres
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_NAME=${DB_NAME:-voice_assistant}
-      - REDIS_HOST=redis
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
-      - LLM_URL=http://ollama:11434/v1/chat/completions
-      - LLM_MODEL=${LLM_MODEL:-gemma3:4b}
-      - WEATHER_API_KEY=${WEATHER_API_KEY}
-      - WEATHER_CITY=${WEATHER_CITY:-Hanoi}
-      - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD:-071205}@postgres:${DB_PORT:-5432}/${DB_NAME:-voice_assistant}
-      - CORS_ORIGIN=http://localhost:${FRONTEND_PORT:-5173}
+      - TZ=Asia/Ho_Chi_Minh
     depends_on:
       postgres:
         condition: service_healthy
+
       redis:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
-    networks:
-      - voice-assistant-network
-    restart: unless-stopped
+
     volumes:
       - ./backend/logs:/app/logs
 
-  # AI Services (Flask + ML)
+    restart: unless-stopped
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # AI SERVICES
+  # =========================
   ai-services:
     build:
       context: ./ai-services
       dockerfile: Dockerfile
     container_name: voice-assistant-ai-services
+
     ports:
       - "${AI_SERVICES_PORT:-5000}:5000"
+
     environment:
       - FLASK_ENV=production
       - PYTHONPATH=/app
+
     volumes:
       - ./ai-services/models:/app/models
       - ./ai-services/data:/app/data
-      - ai_temp:/app/temp
-    networks:
-      - voice-assistant-network
-    restart: unless-stopped
+
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:5000')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  # Ollama Service (LLM)
-  ollama:
-    image: ollama/ollama:latest
-    container_name: voice-assistant-ollama
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-    volumes:
-      - ollama_data:/root/.ollama
+    restart: unless-stopped
     networks:
       - voice-assistant-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
-  # PostgreSQL Database
+  # =========================
+  # POSTGRES
+  # =========================
   postgres:
-    image: postgres:15-alpine
-    container_name: voice-assistant-db
+    image: postgres:16-alpine
+    container_name: voice-assistant-postgres
+
     environment:
-      - POSTGRES_DB=${DB_NAME:-voice_assistant}
-      - POSTGRES_USER=${DB_USER:-admin}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-071205}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
     ports:
       - "${DB_PORT:-5432}:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - voice-assistant-network
-    restart: unless-stopped
+
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis (for BullMQ)
+    restart: unless-stopped
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # REDIS
+  # =========================
   redis:
     image: redis:7-alpine
     container_name: voice-assistant-redis
+
     ports:
       - "${REDIS_PORT:-6379}:6379"
+
     volumes:
       - redis_data:/data
-    networks:
-      - voice-assistant-network
-    restart: unless-stopped
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Ollama Model Initializer (runs once to download Gemma3:4b)
-  ollama-init:
-    image: ollama/ollama:latest
-    container_name: voice-assistant-ollama-init
-    depends_on:
-      ollama:
-        condition: service_healthy
+    restart: unless-stopped
     networks:
       - voice-assistant-network
-    volumes:
-      - ollama_data:/root/.ollama
-    restart: "no"
-    entrypoint: >
-      sh -c "
-        ollama pull ${LLM_MODEL:-gemma3:4b} &&
-        echo 'Model ${LLM_MODEL:-gemma3:4b} downloaded successfully'
-      "
 
 volumes:
   postgres_data:
   redis_data:
-  ollama_data:
-  ai_temp:
 
 networks:
   voice-assistant-network:

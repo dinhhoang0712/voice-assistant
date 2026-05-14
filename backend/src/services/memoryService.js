@@ -21,7 +21,7 @@ async function saveMemory(userId, field, value) {
     const hobbies = new Set(profile.hobbies || []);
 
     if (hobbies.has(normalizedValue)) {
-      return null;
+      return false;
     }
 
     hobbies.add(normalizedValue);
@@ -30,40 +30,39 @@ async function saveMemory(userId, field, value) {
       hobbies: [...hobbies],
     });
 
-    return `Đã thêm sở thích: ${normalizedValue}.`;
+    return true;
   }
 
   if (oldValue === value) {
-    return null;
+    return false;
   }
 
-  // update field
   await updateUserProfile(userId, {
     [field]: value,
   });
 
-  if (oldValue !== undefined && oldValue !== null) {
-    return `Đã cập nhật ${field} từ ${oldValue} thành ${value}.`;
-  }
-
-  return `Đã ghi nhớ ${field}: ${value}.`;
+  return true;
 }
-
 export async function handlePersonalization(userId, text) {
   text = normalizeText(text);
 
-  /* Rule-based extraction */
   for (const rule of MEMORY_RULES) {
     for (const pattern of rule.patterns) {
       const match = text.match(pattern);
+
       if (!match) continue;
 
-      const value = match[1]?.trim();
-      if (!value || isInvalidMemoryValue(value)) return null;
+      const value = rule.value || match[1]?.trim();
 
-      const msg = await saveMemory(userId, rule.field, value);
+      if (!value || isInvalidMemoryValue(value)) {
+        return null;
+      }
 
-      if (msg) return msg;
+      const saved = await saveMemory(userId, rule.field, value);
+
+      if (!saved) {
+        return null;
+      }
 
       return rule.template.replace("{}", value);
     }

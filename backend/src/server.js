@@ -18,6 +18,7 @@ import { historyRouter } from "./routes/historyRouter.js";
 import { userRouter } from "./routes/userRouter.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import "./workers/reminderWorker.js";
+process.env.TZ = "Asia/Ho_Chi_Minh";
 
 const app = express();
 const server = createServer(app);
