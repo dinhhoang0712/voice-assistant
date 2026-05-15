@@ -59,7 +59,7 @@ app.use(cors({ origin: corsOriginOption, credentials: true }));
  *             schema:
  *               $ref: '#/components/schemas/HealthResponse'
  */
-app.get("/health", (_req, res) => res.json({ ok: true }));
+app.get("/api/health", (_req, res) => res.json({ ok: true }));
 // Swagger documentation
 app.use(
   "/api-docs",

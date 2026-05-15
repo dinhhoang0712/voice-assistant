@@ -16,7 +16,7 @@ class VoiceSocketManager {
       return this.socket;
     }
 
-    this.socket = io("http://localhost:3000", {
+    this.socket = io("/", {
       transports: ["websocket"],
       withCredentials: true,
       reconnection: true,
@@ -54,7 +54,10 @@ class VoiceSocketManager {
     this.socket.on("reconnect_error", (error) => {
       console.error("Socket reconnection error:", error);
       this.reconnectAttempts++;
-      this.notifyCallbacks("reconnect_error", { error, attempt: this.reconnectAttempts });
+      this.notifyCallbacks("reconnect_error", {
+        error,
+        attempt: this.reconnectAttempts,
+      });
     });
 
     this.socket.on("voice:ready", (data) => {
@@ -96,11 +99,11 @@ class VoiceSocketManager {
 
   on(event, callback) {
     this.connectionCallbacks.add({ event, callback });
-    
+
     if (this.socket) {
       this.socket.on(event, callback);
     }
-    
+
     return () => this.off(event, callback);
   }
 
@@ -110,7 +113,7 @@ class VoiceSocketManager {
         this.connectionCallbacks.delete(index);
       }
     });
-    
+
     if (this.socket) {
       this.socket.off(event, callback);
     }

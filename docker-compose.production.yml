@@ -1,6 +1,6 @@
 services:
   # =========================
-  # NGINX (REVERSE PROXY)
+  # NGINX GATEWAY
   # =========================
   nginx:
     image: nginx:alpine
@@ -22,15 +22,15 @@ services:
   # FRONTEND
   # =========================
   frontend:
-  build:
-    context: ./frontend
-    dockerfile: Dockerfile
-  container_name: voice-assistant-frontend
-  expose:
-    - "80"
-  restart: unless-stopped
-  networks:
-    - voice-assistant-network
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: voice-assistant-frontend
+    expose:
+      - "80"
+    restart: unless-stopped
+    networks:
+      - voice-assistant-network
 
   # =========================
   # BACKEND
@@ -86,7 +86,7 @@ services:
       - ./ai-services/data:/app/data
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -96,7 +96,7 @@ services:
       - voice-assistant-network
 
   # =========================
-  # POSTGRES (NO PUBLIC PORT)
+  # POSTGRES
   # =========================
   postgres:
     image: postgres:16-alpine
@@ -122,7 +122,7 @@ services:
       - voice-assistant-network
 
   # =========================
-  # REDIS (NO PUBLIC PORT)
+  # REDIS
   # =========================
   redis:
     image: redis:7-alpine

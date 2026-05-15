@@ -11,11 +11,9 @@ class AuthError extends Error {
 }
 
 function signAccessToken(userId) {
-  return jwt.sign(
-    { userId: String(userId) },
-    env.jwtSecret,
-    { expiresIn: env.jwtExpiresIn },
-  );
+  return jwt.sign({ userId: String(userId) }, env.jwtSecret, {
+    expiresIn: env.jwtExpiresIn,
+  });
 }
 
 export async function registerUser({ name, email, password }) {
@@ -32,7 +30,12 @@ export async function registerUser({ name, email, password }) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await createUser({ name, email, hashedPassword });
+  const user = await createUser({
+    name,
+    email,
+    hashedPassword,
+    profile: { name: name },
+  });
   const accessToken = signAccessToken(user.id);
 
   return {
