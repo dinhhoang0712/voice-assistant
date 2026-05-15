@@ -23,7 +23,7 @@ jobs:
           script: |
             set -e
 
-            cd /services/voice-assistant
+            cd services/voice-assistant/
 
             echo "📥 Updating source..."
             git fetch origin master
