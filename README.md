@@ -17,12 +17,14 @@ voice-assistant/
 ## 🚀 Tính năng Chính
 
 ### 🤖 AI Services (Port 5000)
+
 - **Chuyển đổi Giọng nói thành Văn bản (STT)**: Sử dụng mô hình Whisper
 - **Chuyển đổi Văn bản thành Giọng nói (TTS)**: Sử dụng Google Text-to-Speech
 - **Phân loại Ý định**: Phân loại ý định người dùng với Machine Learning
 - **Truy xuất FAQ**: Tìm kiếm ngữ nghĩa cho câu hỏi thường gặp
 
 ### 🔧 Backend API (Port 3000)
+
 - **Xác thực người dùng**: JWT-based authentication
 - **Trò chuyện giọng nói**: Xử lý audio real-time
 - **Trò chuyện văn bản**: Chat-based communication
@@ -33,6 +35,7 @@ voice-assistant/
 - **Weather Integration**: Lấy thông tin thời tiết thực tế
 
 ### 🎨 Frontend (Port 5173)
+
 - **Giao diện hiện đại**: React + Vite + TailwindCSS
 - **Responsive design**: Tương thích trên mọi thiết bị
 - **Real-time updates**: Kết nối Socket.IO client
@@ -40,6 +43,7 @@ voice-assistant/
 - **User authentication**: Đăng nhập/đăng ký người dùng
 
 ### 📱 Mobile App (React Native/Expo)
+
 - **Cross-platform**: iOS, Android, Web
 - **Voice Chat**: Ghi âm và xử lý giọng nói
 - **Real-time Communication**: Socket.IO integration
@@ -50,6 +54,7 @@ voice-assistant/
 ## 🛠️ Công nghệ Sử dụng
 
 ### AI Services
+
 - **Backend**: Flask
 - **STT**: Faster-Whisper (model medium)
 - **TTS**: Google Text-to-Speech (gTTS)
@@ -57,6 +62,7 @@ voice-assistant/
 - **Ngôn ngữ**: Python
 
 ### Backend
+
 - **Runtime**: Node.js
 - **Framework**: Express.js
 - **Database**: PostgreSQL + Sequelize ORM
@@ -69,6 +75,7 @@ voice-assistant/
 - **Redis**: Message broker và caching cho BullMQ
 
 ### Frontend
+
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
@@ -78,6 +85,7 @@ voice-assistant/
 - **Icons**: React Icons
 
 ### Mobile
+
 - **Framework**: React Native 0.81
 - **Platform**: Expo SDK 54
 - **Navigation**: React Navigation v7
@@ -89,18 +97,21 @@ voice-assistant/
 ## 📦 Cài đặt và Cấu hình
 
 ### Yêu cầu hệ thống
+
 - Node.js 18+
 - Python 3.8+
 - PostgreSQL 12+
 - Git
 
 ### 1. Clone Repository
+
 ```bash
 git clone <repository-url>
 cd voice-assistant
 ```
 
 ### 2. Cài đặt AI Services
+
 ```bash
 cd ai-services
 pip install flask faster-whisper gtts sentence-transformers scikit-learn pandas numpy joblib
@@ -111,6 +122,7 @@ python ml/build_faq_embeddings.py
 ```
 
 ### 3. Cài đặt Backend
+
 ```bash
 cd ../backend
 npm install
@@ -121,18 +133,21 @@ cp .env.example .env
 ```
 
 ### 4. Cài đặt Frontend
+
 ```bash
 cd ../frontend
 npm install
 ```
 
 ### 5. Cài đặt Mobile App
+
 ```bash
 cd ../mobile
 npm install
 ```
 
 ### 5. Cấu hình Database
+
 ```bash
 # Tạo database PostgreSQL
 createdb voice_assistant
@@ -145,6 +160,7 @@ createdb voice_assistant
 ### 🔧 Bước 1: Cấu hình Môi trường
 
 Tạo file môi trường từ file mẫu:
+
 ```bash
 # Copy file môi trường
 cp .env.example .env
@@ -154,11 +170,12 @@ nano .env  # hoặc dùng editor khác
 ```
 
 **Các biến cần thay đổi:**
+
 ```env
 # Database Configuration
 DB_PASSWORD=your_secure_password_here      # → Đặt password thật
 
-# JWT Configuration  
+# JWT Configuration
 JWT_SECRET=your_jwt_secret_key_here         # → Đặt secret thật
 
 # Weather API Configuration
@@ -176,6 +193,7 @@ REDIS_PORT=6379
 ### 🚀 Bước 2: Khởi động System
 
 **Option 1: Complete System (Khuyến nghị)**
+
 ```bash
 # Build và start tất cả services
 docker-compose up -d --build
@@ -188,6 +206,7 @@ docker-compose ps
 ```
 
 **Option 2: Start từng service riêng**
+
 ```bash
 # Chỉ frontend
 docker-compose up -d frontend
@@ -205,6 +224,7 @@ docker-compose up -d ollama ollama-init
 ### 🔍 Bước 3: Kiểm tra và Troubleshoot
 
 **Kiểm tra health status:**
+
 ```bash
 # Xem tất cả containers
 docker-compose ps
@@ -217,6 +237,7 @@ docker-compose logs -f ollama
 ```
 
 **Các lệnh hữu ích:**
+
 ```bash
 # Restart specific service
 docker-compose restart backend
@@ -234,6 +255,7 @@ docker-compose up -d --build backend
 ### 📱 Bước 4: Truy cập Applications
 
 Sau khi khởi động thành công:
+
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **AI Services**: http://localhost:5000
@@ -243,6 +265,7 @@ Sau khi khởi động thành công:
 ### 🛠️ Bước 5: Development Workflow
 
 **Để chạy local development:**
+
 ```bash
 # Terminal 1: AI Services
 cd ai-services
@@ -266,6 +289,7 @@ ollama pull gemma3:4b
 Sau khi deploy thành công với Docker:
 
 ### Production URLs
+
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **AI Services**: http://localhost:5000
@@ -273,6 +297,7 @@ Sau khi deploy thành công với Docker:
 - **API Documentation**: http://localhost:3000/api-docs
 
 ### Local Development URLs
+
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **AI Services**: http://localhost:5000
@@ -281,12 +306,14 @@ Sau khi deploy thành công với Docker:
 ## 📡 API Endpoints
 
 ### AI Services
+
 - `POST /stt/transcribe` - Chuyển đổi giọng nói thành văn bản
 - `POST /tts/speak` - Chuyển đổi văn bản thành giọng nói
 - `POST /intent/predict` - Phân loại ý định người dùng
 - `POST /faq` - Truy xuất câu trả lời FAQ
 
 ### Backend
+
 - `POST /api/auth/register` - Đăng ký tài khoản
 - `POST /api/auth/login` - Đăng nhập
 - `POST /api/assistant/voice-chat` - Trò chuyện giọng nói
@@ -297,6 +324,7 @@ Sau khi deploy thành công với Docker:
 ## 🔐 Authentication
 
 Sử dụng JWT tokens cho xác thực:
+
 ```bash
 # Header cho API requests
 Authorization: Bearer <your-jwt-token>
@@ -305,6 +333,7 @@ Authorization: Bearer <your-jwt-token>
 ## 🗄️ Cấu trúc Database
 
 ### Models chính
+
 - **Users**: Thông tin người dùng
 - **Conversations**: Lịch sử trò chuyện
 - **Reminders**: Nhắc nhở thông minh
@@ -312,6 +341,7 @@ Authorization: Bearer <your-jwt-token>
 ## 🔧 Development
 
 ### Scripts hữu ích
+
 ```bash
 # Backend
 npm run dev        # Development mode
@@ -334,6 +364,7 @@ npm run lint        # Run ESLint
 ```
 
 ### Environment Variables
+
 ```bash
 # Backend (.env)
 PORT=3000
@@ -358,6 +389,7 @@ VITE_AI_SERVICE_URL=http://localhost:5000
 ## 🧪 Testing
 
 ### AI Services
+
 ```bash
 # Test STT
 curl -X POST -F "audio=@test.wav" http://localhost:5000/stt/transcribe
@@ -367,6 +399,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"text":"Xin chào"}' http:
 ```
 
 ### Backend
+
 ```bash
 # Test health check
 curl http://localhost:3000/health
@@ -395,10 +428,10 @@ curl -X GET -H "Authorization: Bearer <token>" "http://localhost:3000/api/weathe
 - Input validation
 - Password hashing với bcrypt
 
-
 ## 🚀 Deployment
 
 ### Production Environment Variables
+
 ```bash
 NODE_ENV=production
 PORT=3000
@@ -410,6 +443,7 @@ CORS_ORIGIN=https://yourdomain.com
 ### Docker Deployment
 
 **Complete System với Docker Compose:**
+
 ```bash
 # Start tất cả services
 docker-compose up -d --build
@@ -425,6 +459,7 @@ docker-compose pull && docker-compose up -d
 ```
 
 **Individual Service Containers:**
+
 ```bash
 # Frontend only
 docker-compose up -d frontend
@@ -451,8 +486,8 @@ docker-compose up -d ollama ollama-init
 
 - [x] Docker containerization
 - [x] Mobile app development (React Native/Expo)
-- [ ] Automated testing setup
-- [ ] CI/CD pipeline
+- [x] Automated testing setup
+- [x] CI/CD pipeline
 - [ ] Rate limiting implementation
 - [ ] Advanced error handling
 - [ ] Performance monitoring
@@ -462,7 +497,6 @@ docker-compose up -d ollama ollama-init
 ## 📄 License
 
 Dự án được cấp phép theo MIT License.
-
 
 ## 🔍 Troubleshooting
 
@@ -474,6 +508,7 @@ Dự án được cấp phép theo MIT License.
 4. **AI models**: Đảm bảo đã huấn luyện models trước khi chạy AI services
 
 ### Debug Mode
+
 ```bash
 # Backend debug
 DEBUG=* npm run dev
