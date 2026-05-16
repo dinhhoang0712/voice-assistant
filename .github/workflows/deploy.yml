@@ -1,4 +1,4 @@
-name: Auto Deploy Voice Assistant (Safe Production)
+name: Production Deploy Voice Assistant (Hardened)
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH (Hardened)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -21,56 +21,89 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
 
           script: |
-            set -e
+            set -euo pipefail
 
-            cd services/voice-assistant/
+            PROJECT_DIR="services/voice-assistant"
+            cd "$PROJECT_DIR"
 
             echo "================================="
+            echo "🚀 START PRODUCTION DEPLOY"
+            echo "================================="
+
+            # =========================
+            # 1. BACKUP DATABASE (HARD GATE)
+            # =========================
             echo "💾 BACKUP DATABASE"
-            echo "================================="
+
+            mkdir -p backups
 
             BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
 
-            docker exec voice-assistant-postgres \
-              pg_dump -U $DB_USER $DB_NAME > ./backups/$BACKUP_FILE
+            if ! docker exec voice-assistant-postgres \
+              pg_dump -U "$DB_USER" "$DB_NAME" > "backups/$BACKUP_FILE"; then
+              echo "❌ DB backup failed - ABORT DEPLOY"
+              exit 1
+            fi
 
-            echo "Backup saved: $BACKUP_FILE"
+            if [ ! -s "backups/$BACKUP_FILE" ]; then
+              echo "❌ Backup file is empty - ABORT DEPLOY"
+              exit 1
+            fi
 
-            echo "================================="
-            echo "📥 UPDATE SOURCE CODE"
-            echo "================================="
+            echo "✅ Backup OK: $BACKUP_FILE"
+
+            # =========================
+            # 2. PULL LATEST CODE
+            # =========================
+            echo "📥 PULL LATEST CODE"
 
             git fetch origin master
             git reset --hard origin/master
 
-            echo "================================="
-            echo "🐳 DEPLOY NEW VERSION (ZERO DOWNTIME)"
-            echo "================================="
+            # =========================
+            # 3. BUILD & DEPLOY
+            # =========================
+            echo "🐳 BUILD & DEPLOY"
 
-            docker compose -f docker-compose.production.yml up -d --build
+            if ! docker compose -f docker-compose.production.yml up -d --build; then
+              echo "❌ Docker build failed"
+              exit 1
+            fi
 
-            echo "================================="
-            echo "❤️ HEALTH CHECK GATEWAY"
-            echo "================================="
+            # =========================
+            # 4. HEALTH CHECK (GATE)
+            # =========================
+            echo "❤️ HEALTH CHECK"
 
-            for i in {1..10}
-            do
-              if curl -f http://localhost/health; then
-                echo "✅ Health check passed"
-                exit 0
+            for i in {1..12}; do
+              if curl -fs http://localhost/health; then
+                echo "✅ HEALTH CHECK PASSED"
+                break
               fi
 
               echo "⏳ Waiting... attempt $i"
               sleep 5
+
+              if [ $i -eq 12 ]; then
+                echo "❌ HEALTH CHECK FAILED"
+
+                # =========================
+                # 5. ROLLBACK CODE
+                # =========================
+                echo "🔁 ROLLBACK CODE"
+
+                git reset --hard HEAD~1
+                docker compose -f docker-compose.production.yml up -d --build
+
+                exit 1
+              fi
             done
 
-            echo "❌ HEALTH CHECK FAILED - ROLLBACK"
+            # =========================
+            # 6. FINAL VERIFICATION
+            # =========================
+            echo "🔍 FINAL CHECK"
 
-            echo "================================="
-            echo "🔁 ROLLBACK"
-            echo "================================="
+            docker ps | grep voice-assistant
 
-            git reset --hard HEAD~1
-            docker compose -f docker-compose.production.yml up -d --build
-
-            exit 1
+            echo "🎉 DEPLOY SUCCESSFUL"
