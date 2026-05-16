@@ -6,50 +6,54 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://loki:3100/loki/api/v1/push
+  - url: http://voice-assistant-loki:3100/loki/api/v1/push
 
 scrape_configs:
-  # Scrape Docker container logs
+  # Docker container logs
   - job_name: docker
-    docker:
-      max_concurrent_downloads: 10
-      sd_configs:
-        - host: unix:///var/run/docker.sock
-          refresh_interval: 5s
-    relabel_configs:
-      - source_labels: [__meta_docker_container_name]
-        regex: /(.*)
-        target_label: container
-      - source_labels: [__meta_docker_container_log_stream]
-        target_label: stream
-      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
-        target_label: service
 
-  # Scrape application logs from backend
-  - job_name: backend
     static_configs:
       - targets:
           - localhost
+
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*-json.log
+
+    pipeline_stages:
+      - docker: {}
+
+  # Backend file logs
+  - job_name: backend
+
+    static_configs:
+      - targets:
+          - localhost
+
         labels:
           job: backend
           service: voice-assistant-backend
           __path__: /var/log/backend/*.log
 
-  # Scrape application logs from ai-services
+  # AI services logs
   - job_name: ai-services
+
     static_configs:
       - targets:
           - localhost
+
         labels:
           job: ai-services
           service: voice-assistant-ai-services
           __path__: /var/log/ai-services/*.log
 
-  # Scrape system logs
+  # System logs
   - job_name: system
+
     static_configs:
       - targets:
           - localhost
+
         labels:
           job: system
           __path__: /var/log/*.log
