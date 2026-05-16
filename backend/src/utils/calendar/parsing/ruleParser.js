@@ -1,4 +1,4 @@
-import { normalizeText } from "../../helper.js";
+import { cleanupAsrText } from "../../helper.js";
 import { clampInt, isValidDate, stripCommandNoise } from "../calendarUtils.js";
 
 function applyDayPeriod(text, hour) {
@@ -188,7 +188,7 @@ export function extractId(text) {
 }
 
 export function pickCandidatesByTitle(reminders, rawText) {
-  const key = normalizeText(extractTitle(rawText));
+  const key = cleanupAsrText(extractTitle(rawText));
   if (!key) return [];
-  return reminders.filter((r) => normalizeText(r.title).includes(key));
+  return reminders.filter((r) => cleanupAsrText(r.title).includes(key));
 }

@@ -5,10 +5,10 @@ import { retrieveFAQ } from "./aiApiService.js";
 import { generateAnswer } from "./llmService.js";
 import { handlePersonalization } from "./memoryService.js";
 import { getUserProfile } from "../repository/userRepository.js";
-import { normalizeText } from "../utils/helper.js";
+import { cleanupAsrText } from "../utils/helper.js";
 
 export const qaHandler = async (rawText, userId) => {
-  let text = normalizeText(rawText);
+  let text = cleanupAsrText(rawText);
 
   // 1. time query
   const timeAnswer = handleTimeQuery(text);

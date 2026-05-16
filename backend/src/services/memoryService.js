@@ -3,7 +3,7 @@ import {
   getUserProfile,
   updateUserProfile,
 } from "../repository/userRepository.js";
-import { normalizeText } from "../utils/helper.js";
+import { cleanupAsrText } from "../utils/helper.js";
 
 function isInvalidMemoryValue(value) {
   const invalid = ["gì", "bao nhiêu", "ở đâu", "khi nào", "là ai", "thế nào"];
@@ -44,7 +44,7 @@ async function saveMemory(userId, field, value) {
   return true;
 }
 export async function handlePersonalization(userId, text) {
-  text = normalizeText(text);
+  text = cleanupAsrText(text);
 
   for (const rule of MEMORY_RULES) {
     for (const pattern of rule.patterns) {

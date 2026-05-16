@@ -31,7 +31,7 @@ export default function CustomizePage() {
         onClick={() => navigate("/")}
       />
       <h1 className="text-white mb-[40px] text-[30px] text-center ">
-        Select your <span className="text-blue-200">Assistant Image</span>
+        Vui lòng chọn <span className="text-blue-200">hình ảnh trợ lý</span>
       </h1>
       <div className="w-full max-w-[900px] flex justify-center items-center flex-wrap gap-[15px]">
         {PRESET_ASSISTANT_IMAGES.map((src, index) => (

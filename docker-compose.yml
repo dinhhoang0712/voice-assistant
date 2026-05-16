@@ -6,14 +6,20 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+
     container_name: voice-assistant-frontend
+
     ports:
       - "${FRONTEND_PORT:-80}:80"
+
     env_file:
       - ./frontend/.env
+
     depends_on:
       - backend
+
     restart: unless-stopped
+
     networks:
       - voice-assistant-network
 
@@ -24,7 +30,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+
     container_name: voice-assistant-backend
+
     ports:
       - "${BACKEND_PORT:-3000}:3000"
 
@@ -33,6 +41,9 @@ services:
 
     environment:
       - TZ=Asia/Ho_Chi_Minh
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,7 +54,14 @@ services:
     volumes:
       - ./backend/logs:/app/logs
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
     restart: unless-stopped
+
     networks:
       - voice-assistant-network
 
@@ -54,6 +72,7 @@ services:
     build:
       context: ./ai-services
       dockerfile: Dockerfile
+
     container_name: voice-assistant-ai-services
 
     ports:
@@ -62,25 +81,20 @@ services:
     environment:
       - FLASK_ENV=production
       - PYTHONPATH=/app
+      - TZ=Asia/Ho_Chi_Minh
 
     volumes:
       - ./ai-services/models:/app/models
       - ./ai-services/data:/app/data
 
     healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import requests; requests.get('http://localhost:5000')",
-        ]
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
 
     restart: unless-stopped
+
     networks:
       - voice-assistant-network
 
@@ -89,12 +103,14 @@ services:
   # =========================
   postgres:
     image: postgres:16-alpine
+
     container_name: voice-assistant-postgres
 
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+      - TZ=Asia/Ho_Chi_Minh
 
     ports:
       - "${DB_PORT:-5432}:5432"
@@ -109,6 +125,7 @@ services:
       retries: 5
 
     restart: unless-stopped
+
     networks:
       - voice-assistant-network
 
@@ -117,7 +134,10 @@ services:
   # =========================
   redis:
     image: redis:7-alpine
+
     container_name: voice-assistant-redis
+
+    command: redis-server --appendonly yes
 
     ports:
       - "${REDIS_PORT:-6379}:6379"
@@ -132,13 +152,173 @@ services:
       retries: 5
 
     restart: unless-stopped
+
     networks:
       - voice-assistant-network
 
+  # =========================
+  # POSTGRES EXPORTER
+  # =========================
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+
+    container_name: voice-assistant-postgres-exporter
+
+    ports:
+      - "9187:9187"
+
+    environment:
+      - DATA_SOURCE_NAME=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # REDIS EXPORTER
+  # =========================
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+
+    container_name: voice-assistant-redis-exporter
+
+    ports:
+      - "9121:9121"
+
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # NODE EXPORTER
+  # =========================
+  node-exporter:
+    image: prom/node-exporter:latest
+
+    container_name: voice-assistant-node-exporter
+
+    ports:
+      - "9100:9100"
+
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # CADVISOR
+  # =========================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+
+    container_name: voice-assistant-cadvisor
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # PROMETHEUS
+  # =========================
+  prometheus:
+    image: prom/prometheus:latest
+
+    container_name: voice-assistant-prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # GRAFANA
+  # =========================
+  grafana:
+    image: grafana/grafana:latest
+
+    container_name: voice-assistant-grafana
+
+    ports:
+      - "3001:3000"
+
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+    depends_on:
+      - prometheus
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+# =========================
+# VOLUMES
+# =========================
 volumes:
   postgres_data:
   redis_data:
+  prometheus_data:
+  grafana_data:
 
+# =========================
+# NETWORK
+# =========================
 networks:
   voice-assistant-network:
     driver: bridge

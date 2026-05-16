@@ -51,7 +51,7 @@ export default function SignUpPage() {
           Tạo tài khoản <span className="text-sky-300">Trợ lý giọng nói</span>
         </h1>
         <p className="text-white/70 text-sm text-center max-w-sm">
-          Backend yêu cầu: họ tên, email hợp lệ và mật khẩu tối thiểu 6 ký tự.
+          Hệ thống yêu cầu: họ tên, email hợp lệ và mật khẩu tối thiểu 6 ký tự.
         </p>
 
         <input

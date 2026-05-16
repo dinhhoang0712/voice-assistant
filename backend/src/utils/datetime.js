@@ -1,4 +1,4 @@
-import { normalizeText } from "./helper.js";
+import { cleanupAsrText } from "./helper.js";
 
 const WEEKDAYS = [
   "Thứ Hai",
@@ -21,7 +21,7 @@ export function getNow() {
 }
 
 export function handleTimeQuery(text) {
-  text = normalizeText(text);
+  text = cleanupAsrText(text);
 
   const now = getNow();
 

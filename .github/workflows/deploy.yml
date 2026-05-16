@@ -1,4 +1,4 @@
-name: Auto Deploy Voice Assistant
+name: Auto Deploy Voice Assistant (Safe Production)
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Deploy via SSH
@@ -25,14 +25,52 @@ jobs:
 
             cd services/voice-assistant/
 
-            echo "📥 Updating source..."
+            echo "================================="
+            echo "💾 BACKUP DATABASE"
+            echo "================================="
+
+            BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
+
+            docker exec voice-assistant-postgres \
+              pg_dump -U $DB_USER $DB_NAME > ./backups/$BACKUP_FILE
+
+            echo "Backup saved: $BACKUP_FILE"
+
+            echo "================================="
+            echo "📥 UPDATE SOURCE CODE"
+            echo "================================="
+
             git fetch origin master
             git reset --hard origin/master
 
-            echo "🐳 Rebuilding containers..."
-            docker compose -f docker-compose.production.yml up -d --build --remove-orphans
+            echo "================================="
+            echo "🐳 DEPLOY NEW VERSION (ZERO DOWNTIME)"
+            echo "================================="
 
-            echo "🧹 Cleaning old Docker images..."
-            docker image prune -af
+            docker compose -f docker-compose.production.yml up -d --build
 
-            echo "✅ Deployment successful!"
+            echo "================================="
+            echo "❤️ HEALTH CHECK GATEWAY"
+            echo "================================="
+
+            for i in {1..10}
+            do
+              if curl -f http://localhost/health; then
+                echo "✅ Health check passed"
+                exit 0
+              fi
+
+              echo "⏳ Waiting... attempt $i"
+              sleep 5
+            done
+
+            echo "❌ HEALTH CHECK FAILED - ROLLBACK"
+
+            echo "================================="
+            echo "🔁 ROLLBACK"
+            echo "================================="
+
+            git reset --hard HEAD~1
+            docker compose -f docker-compose.production.yml up -d --build
+
+            exit 1

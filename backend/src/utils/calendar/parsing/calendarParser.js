@@ -1,5 +1,5 @@
 import { getNow } from "../../datetime.js";
-import { normalizeText } from "../../helper.js";
+import { cleanupAsrText } from "../../helper.js";
 import {
   parseExplicitDate,
   parseRelativeDate,
@@ -43,7 +43,7 @@ export function detectCalendarAction(text) {
 }
 
 export function tryRuleBased(rawText) {
-  const normalized = normalizeText(rawText);
+  const normalized = cleanupAsrText(rawText);
   const now = getNow();
 
   const dateOnly =

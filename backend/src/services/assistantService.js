@@ -4,6 +4,7 @@ import { qaHandler } from "./qaService.js";
 import { handlePersonalization } from "./memoryService.js";
 import { deviceHandler } from "./deviceControlService.js";
 import { calendarHandler } from "./calendarService.js";
+import { processUserInput } from "../utils/textNormalization.js";
 
 const detectPlatformFromUserAgent = (ua) => {
   const s = (ua || "").toLowerCase();
@@ -28,7 +29,13 @@ export const handleVoiceChat = async ({
     text = content;
   }
 
-  text = text.trim().toLowerCase();
+  const processed = await processUserInput({
+    text,
+    isVoice: check,
+  });
+
+  text = processed.final;
+
   // 2. Save user message
   await createMessage(userId, "user", text);
 

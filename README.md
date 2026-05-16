@@ -1,526 +1,431 @@
-# Voice Assistant - Trợ lý Ảo Giọng nói
+# 🎙️ Voice Assistant - Hệ thống Trợ lý Ảo AI (Kiến trúc Senior)
 
-Một dự án trợ lý ảo giọng nói hoàn chỉnh với khả năng xử lý ngôn ngữ tự nhiên, chuyển đổi giọng nói và giao diện web hiện đại.
+Một nền tảng **trợ lý ảo giọng nói cấp production** được xây dựng theo kiến trúc microservices, hỗ trợ AI đa mô hình, giao tiếp real-time và DevOps đầy đủ (Docker + CI/CD + Monitoring).
 
-## 🏗️ Kiến trúc Tổng quan
+---
 
-Dự án được xây dựng theo kiến trúc microservices với 3 thành phần chính:
+## 🧭 Tóm tắt dự án (Executive Summary)
 
+Voice Assistant là hệ thống AI phân tán cho phép người dùng tương tác bằng **giọng nói và văn bản**, với khả năng xử lý ngữ cảnh và phản hồi thông minh theo thời gian thực.
+
+### Năng lực cốt lõi
+
+- 🎤 Chuyển giọng nói thành văn bản (Whisper)
+- 🔊 Chuyển văn bản thành giọng nói (TTS - gTTS)
+- 🧠 Nhận diện ý định người dùng (Machine Learning)
+- 🤖 Điều phối LLM (Gemma-3-4B / Ollama / Groq)
+- ⚡ Giao tiếp real-time (Socket.IO)
+- 📌 Lập lịch tác vụ (BullMQ + Redis)
+- 📊 Quan sát hệ thống (Prometheus + Grafana)
+
+---
+
+## 🏗️ Kiến trúc hệ thống mức cao
+
+```text
+                    ┌────────────────────────┐
+                    │     Tầng Client       │
+                    │ Web / Mobile / Voice  │
+                    └──────────┬─────────────┘
+                               │
+                ┌──────────────▼──────────────┐
+                │     API Gateway (Nginx)     │
+                └──────────────┬──────────────┘
+                               │
+     ┌─────────────────────────┼─────────────────────────┐
+     │                         │                         │
+┌────▼──────┐        ┌────────▼────────┐      ┌─────────▼────────┐
+│ Frontend  │        │ Backend API     │      │ AI Services       │
+│ React     │        │ Node.js/Express │      │ Flask (Whisper)   │
+└───────────┘        └────────┬────────┘      └─────────┬────────┘
+                               │                        │
+              ┌────────────────┼───────────────┐       │
+              │                │               │       │
+       ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐ │
+       │ PostgreSQL  │ │ Redis Queue │ │ LLM Layer   │ │
+       │ (CSDL chính) │ │ BullMQ      │ │ Gemma/Ollama│ │
+       └─────────────┘ └─────────────┘ └─────────────┘ │
+                                                        │
+                                              ┌─────────▼─────────┐
+                                              │ STT / TTS / ML    │
+                                              └────────────────────┘
 ```
-voice-assistant/
-├── ai-services/          # Microservice AI (Python/Flask)
-├── backend/              # API Backend (Node.js/Express)
-├── frontend/             # Giao diện Web (React/Vite)
-└── mobile/               # Mobile App (React Native/Expo)
+
+---
+
+## 🔄 Luồng xử lý dữ liệu (Voice Pipeline)
+
+```text
+Người dùng (Giọng nói)
+        ↓
+Frontend (Ghi âm audio)
+        ↓
+Backend API
+        ↓
+AI Service (Whisper - STT)
+        ↓
+Phân loại ý định (Intent ML)
+        ↓
+LLM (Gemma-3-4B)
+        ↓
+Sinh phản hồi
+        ↓
+TTS (Chuyển thành giọng nói)
+        ↓
+Phát lại cho người dùng
 ```
 
-## 🚀 Tính năng Chính
+---
 
-### 🤖 AI Services (Port 5000)
+## ⚙️ Phân rã Microservices
 
-- **Chuyển đổi Giọng nói thành Văn bản (STT)**: Sử dụng mô hình Whisper
-- **Chuyển đổi Văn bản thành Giọng nói (TTS)**: Sử dụng Google Text-to-Speech
-- **Phân loại Ý định**: Phân loại ý định người dùng với Machine Learning
-- **Truy xuất FAQ**: Tìm kiếm ngữ nghĩa cho câu hỏi thường gặp
+### 1. Backend (Node.js + Express)
 
-### 🔧 Backend API (Port 3000)
+Chịu trách nhiệm:
 
-- **Xác thực người dùng**: JWT-based authentication
-- **Trò chuyện giọng nói**: Xử lý audio real-time
-- **Trò chuyện văn bản**: Chat-based communication
-- **LLM Integration**: Kết nối với Language Model (Gemma-3-4B) cho AI responses
-- **Nhắc nhở thông minh**: Smart reminders với BullMQ + Redis workers
-- **Lịch sử trò chuyện**: Lưu trữ và truy xuất cuộc hội thoại
-- **Real-time communication**: Socket.IO cho cập nhật real-time
-- **Weather Integration**: Lấy thông tin thời tiết thực tế
+- Xác thực người dùng (JWT)
+- Điều phối hội thoại
+- API gateway logic
+- Socket.IO realtime
+- Queue xử lý nền (BullMQ)
 
-### 🎨 Frontend (Port 5173)
+### 2. AI Services (Python Flask)
 
-- **Giao diện hiện đại**: React + Vite + TailwindCSS
-- **Responsive design**: Tương thích trên mọi thiết bị
-- **Real-time updates**: Kết nối Socket.IO client
-- **Voice recording**: Ghi âm và xử lý audio
-- **User authentication**: Đăng nhập/đăng ký người dùng
+Chịu trách nhiệm:
 
-### 📱 Mobile App (React Native/Expo)
+- STT (Whisper inference)
+- TTS (gTTS)
+- Phân loại ý định
+- Tìm kiếm FAQ semantic
 
-- **Cross-platform**: iOS, Android, Web
-- **Voice Chat**: Ghi âm và xử lý giọng nói
-- **Real-time Communication**: Socket.IO integration
-- **Navigation**: React Navigation
-- **Audio Processing**: Expo Audio & AV
-- **Offline Support**: Local storage cho conversations
+### 3. Frontend (React)
 
-## 🛠️ Công nghệ Sử dụng
+Chịu trách nhiệm:
 
-### AI Services
+- Giao diện chat
+- Ghi âm giọng nói
+- Kết nối realtime
+- Xác thực người dùng
 
-- **Backend**: Flask
-- **STT**: Faster-Whisper (model medium)
-- **TTS**: Google Text-to-Speech (gTTS)
-- **ML**: scikit-learn, Sentence Transformers
-- **Ngôn ngữ**: Python
+### 4. Mobile App (React Native)
+
+- Đa nền tảng (iOS/Android/Web)
+- Voice chat
+- Offline cache
+- Socket.IO realtime
+
+---
+
+## 🧠 Thiết kế tầng AI
+
+### Chiến lược điều phối LLM
+
+```text
+Câu hỏi người dùng
+      ↓
+Nhận diện ý định
+      ↓
+Routing logic
+   ├── FAQ → Embedding Search
+   ├── Task → Tool execution
+   └── General → LLM (Gemma-3-4B)
+```
+
+### Quyết định kiến trúc quan trọng
+
+- Không gọi LLM cho mọi request
+- Routing để giảm chi phí và độ trễ
+- Cache Redis cho truy vấn phổ biến
+
+---
+
+## 🧰 Công nghệ sử dụng
 
 ### Backend
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: PostgreSQL + Sequelize ORM
-- **Real-time**: Socket.IO
-- **Authentication**: JWT
-- **Security**: Helmet, CORS, bcrypt
-- **LLM**: Gemma-3-4B integration
-- **Weather API**: OpenWeatherMap integration
-- **BullMQ**: Queue system cho background jobs (reminders)
-- **Redis**: Message broker và caching cho BullMQ
+- Node.js (Express)
+- PostgreSQL + Sequelize
+- Redis + BullMQ
+- Socket.IO
+- JWT + bcrypt
+
+### AI Services
+
+- Flask
+- Faster-Whisper
+- Sentence Transformers
+- scikit-learn
 
 ### Frontend
 
-- **Framework**: React 19
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS
-- **Routing**: React Router DOM
-- **HTTP Client**: Axios
-- **Real-time**: Socket.IO Client
-- **Icons**: React Icons
+- React 19 + Vite
+- TailwindCSS
+- Axios
+- Socket.IO Client
 
-### Mobile
+### DevOps
 
-- **Framework**: React Native 0.81
-- **Platform**: Expo SDK 54
-- **Navigation**: React Navigation v7
-- **Audio**: Expo Audio & AV
-- **Storage**: AsyncStorage
-- **Real-time**: Socket.IO Client
-- **HTTP Client**: Axios
+- Docker / Docker Compose
+- Nginx Reverse Proxy
+- GitHub Actions CI/CD
+- Prometheus + Grafana
 
-## 📦 Cài đặt và Cấu hình
+---
 
-### Yêu cầu hệ thống
+## 🚀 Kiến trúc triển khai
 
-- Node.js 18+
-- Python 3.8+
-- PostgreSQL 12+
-- Git
-
-### 1. Clone Repository
-
-```bash
-git clone <repository-url>
-cd voice-assistant
+```text
+GitHub Push
+   ↓
+GitHub Actions CI
+   ↓
+Build Docker Images
+   ↓
+Deploy VPS
+   ↓
+Docker Compose Up
+   ↓
+Nginx Reverse Proxy
 ```
 
-### 2. Cài đặt AI Services
+---
 
-```bash
-cd ai-services
-pip install flask faster-whisper gtts sentence-transformers scikit-learn pandas numpy joblib
+## 🔁 CI/CD Pipeline (Production)
 
-# Huấn luyện mô hình
-python ml/train_intent.py
-python ml/build_faq_embeddings.py
+```yaml
+name: Auto Deploy Voice Assistant (Safe Production)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+
+          script: |
+            set -e
+
+            cd services/voice-assistant/
+
+            echo "================================="
+            echo "💾 BACKUP DATABASE"
+            echo "================================="
+
+            BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
+
+            docker exec voice-assistant-postgres \
+              pg_dump -U $DB_USER $DB_NAME > ./backups/$BACKUP_FILE
+
+            echo "Backup saved: $BACKUP_FILE"
+
+            echo "================================="
+            echo "📥 UPDATE SOURCE CODE"
+            echo "================================="
+
+            git fetch origin master
+            git reset --hard origin/master
+
+            echo "================================="
+            echo "🐳 DEPLOY NEW VERSION (ZERO DOWNTIME)"
+            echo "================================="
+
+            docker compose -f docker-compose.production.yml up -d --build
+
+            echo "================================="
+            echo "❤️ HEALTH CHECK GATEWAY"
+            echo "================================="
+
+            for i in {1..10}
+            do
+              if curl -f http://localhost/health; then
+                echo "✅ Health check passed"
+                exit 0
+              fi
+
+              echo "⏳ Waiting... attempt $i"
+              sleep 5
+            done
+
+            echo "❌ HEALTH CHECK FAILED - ROLLBACK"
+
+            echo "================================="
+            echo "🔁 ROLLBACK"
+            echo "================================="
+
+            git reset --hard HEAD~1
+            docker compose -f docker-compose.production.yml up -d --build
+
+            exit 1
 ```
 
-### 3. Cài đặt Backend
+---
 
-```bash
-cd ../backend
-npm install
+## 📊 Quan sát hệ thống (Observability)
 
-# Tạo file .env
-cp .env.example .env
-# Chỉnh sửa các biến môi trường trong .env
+### Metrics chính
+
+- Độ trễ API (p50 / p95 / p99)
+- Tỷ lệ lỗi (4xx / 5xx)
+- Kết nối WebSocket
+- Độ dài queue Redis
+- CPU / RAM / Disk
+- Thời gian xử lý STT/TTS
+
+### Dashboard Grafana
+
+- Sức khỏe hệ thống
+- Hiệu năng API
+- Latency AI inference
+- Queue processing
+
+---
+
+## 🗄️ Thiết kế cơ sở dữ liệu
+
+### Bảng chính
+
+```text
+Users
+├── id
+├── email
+├── password_hash
+
+Conversations
+├── id
+├── user_id
+├── messages
+
+Reminders
+├── id
+├── user_id
+├── schedule_time
+├── status
 ```
 
-### 4. Cài đặt Frontend
+### Chiến lược scale
 
-```bash
-cd ../frontend
-npm install
-```
+- Index theo user_id
+- Cache Redis session nóng
+- Partition hội thoại dài hạn
 
-### 5. Cài đặt Mobile App
+---
 
-```bash
-cd ../mobile
-npm install
-```
+## 🔐 Kiến trúc bảo mật
 
-### 5. Cấu hình Database
-
-```bash
-# Tạo database PostgreSQL
-createdb voice_assistant
-
-# Backend sẽ tự động tạo bảng khi chạy ở development mode
-```
-
-## 🐳 Docker Deployment
-
-### 🔧 Bước 1: Cấu hình Môi trường
-
-Tạo file môi trường từ file mẫu:
-
-```bash
-# Copy file môi trường
-cp .env.example .env
-
-# Chỉnh sửa các biến nhạy cảm
-nano .env  # hoặc dùng editor khác
-```
-
-**Các biến cần thay đổi:**
-
-```env
-# Database Configuration
-DB_PASSWORD=your_secure_password_here      # → Đặt password thật
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key_here         # → Đặt secret thật
-
-# Weather API Configuration
-WEATHER_API_KEY=your_weather_api_key_here   # → Đặt API key thật
-
-# Ports (nếu cần thay đổi)
-FRONTEND_PORT=5173
-BACKEND_PORT=3000
-AI_SERVICES_PORT=5000
-OLLAMA_PORT=11434
-DB_PORT=5432
-REDIS_PORT=6379
-```
-
-### 🚀 Bước 2: Khởi động System
-
-**Option 1: Complete System (Khuyến nghị)**
-
-```bash
-# Build và start tất cả services
-docker-compose up -d --build
-
-# Xem logs
-docker-compose logs -f
-
-# Kiểm tra status
-docker-compose ps
-```
-
-**Option 2: Start từng service riêng**
-
-```bash
-# Chỉ frontend
-docker-compose up -d frontend
-
-# Chỉ backend + database + redis
-docker-compose up -d backend postgres redis
-
-# Chỉ AI services
-docker-compose up -d ai-services
-
-# Chỉ Ollama
-docker-compose up -d ollama ollama-init
-```
-
-### 🔍 Bước 3: Kiểm tra và Troubleshoot
-
-**Kiểm tra health status:**
-
-```bash
-# Xem tất cả containers
-docker-compose ps
-
-# Kiểm tra logs của specific service
-docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f ai-services
-docker-compose logs -f ollama
-```
-
-**Các lệnh hữu ích:**
-
-```bash
-# Restart specific service
-docker-compose restart backend
-
-# Stop tất cả
-docker-compose down
-
-# Xóa volumes (cẩn thận!)
-docker-compose down -v
-
-# Rebuild specific service
-docker-compose up -d --build backend
-```
-
-### 📱 Bước 4: Truy cập Applications
-
-Sau khi khởi động thành công:
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3000
-- **AI Services**: http://localhost:5000
-- **Ollama LLM**: http://localhost:11434
-- **API Documentation**: http://localhost:3000/api-docs
-
-### 🛠️ Bước 5: Development Workflow
-
-**Để chạy local development:**
-
-```bash
-# Terminal 1: AI Services
-cd ai-services
-python app.py
-
-# Terminal 2: Backend
-cd backend
-npm run dev
-
-# Terminal 3: Frontend
-cd frontend
-npm run dev
-
-# Terminal 4: Ollama (nếu cần)
-ollama serve
-ollama pull gemma3:4b
-```
-
-## 🌐 Truy cập ứng dụng
-
-Sau khi deploy thành công với Docker:
-
-### Production URLs
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3000
-- **AI Services**: http://localhost:5000
-- **Ollama LLM**: http://localhost:11434
-- **API Documentation**: http://localhost:3000/api-docs
-
-### Local Development URLs
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3000
-- **AI Services**: http://localhost:5000
-- **API Documentation**: http://localhost:3000/api-docs
-
-## 📡 API Endpoints
-
-### AI Services
-
-- `POST /stt/transcribe` - Chuyển đổi giọng nói thành văn bản
-- `POST /tts/speak` - Chuyển đổi văn bản thành giọng nói
-- `POST /intent/predict` - Phân loại ý định người dùng
-- `POST /faq` - Truy xuất câu trả lời FAQ
-
-### Backend
-
-- `POST /api/auth/register` - Đăng ký tài khoản
-- `POST /api/auth/login` - Đăng nhập
-- `POST /api/assistant/voice-chat` - Trò chuyện giọng nói
-- `POST /api/assistant/chat` - Trò chuyện văn bản với LLM
-- `GET /api/weather` - Lấy thông tin thời tiết
-- `GET /api/history` - Lấy lịch sử trò chuyện
-
-## 🔐 Authentication
-
-Sử dụng JWT tokens cho xác thực:
-
-```bash
-# Header cho API requests
-Authorization: Bearer <your-jwt-token>
-```
-
-## 🗄️ Cấu trúc Database
-
-### Models chính
-
-- **Users**: Thông tin người dùng
-- **Conversations**: Lịch sử trò chuyện
-- **Reminders**: Nhắc nhở thông minh
-
-## 🔧 Development
-
-### Scripts hữu ích
-
-```bash
-# Backend
-npm run dev        # Development mode
-npm start          # Production mode
-
-# Frontend
-npm run dev        # Development server
-npm run build      # Build for production
-npm run preview    # Preview production build
-
-# AI Services
-python app.py      # Start Flask server
-
-# Mobile App
-npm start          # Start Expo development server
-npm run android    # Start with Android emulator
-npm run ios         # Start with iOS simulator
-npm run web         # Start in web browser
-npm run lint        # Run ESLint
-```
-
-### Environment Variables
-
-```bash
-# Backend (.env)
-PORT=3000
-NODE_ENV=development
-DATABASE_URL=postgresql://username:password@localhost:5432/voice_assistant
-JWT_SECRET=your-secret-key
-CORS_ORIGIN=http://localhost:5173
-
-# LLM Configuration
-LLM_URL=http://127.0.0.1:1234/v1/chat/completions
-LLM_MODEL=google/gemma-3-4b
-
-# Weather API
-WEATHER_API_KEY=your_openweathermap_api_key
-WEATHER_CITY=Hanoi
-
-# Frontend (.env)
-VITE_API_URL=http://localhost:3000
-VITE_AI_SERVICE_URL=http://localhost:5000
-```
-
-## 🧪 Testing
-
-### AI Services
-
-```bash
-# Test STT
-curl -X POST -F "audio=@test.wav" http://localhost:5000/stt/transcribe
-
-# Test TTS
-curl -X POST -H "Content-Type: application/json" -d '{"text":"Xin chào"}' http://localhost:5000/tts/speak
-```
-
-### Backend
-
-```bash
-# Test health check
-curl http://localhost:3000/health
-
-# Test authentication
-curl -X POST -H "Content-Type: application/json" -d '{"username":"test","password":"test"}' http://localhost:3000/api/auth/login
-
-# Test LLM chat
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer <token>" -d '{"message":"Xin chào"}' http://localhost:3000/api/assistant/chat
-
-# Test weather API
-curl -X GET -H "Authorization: Bearer <token>" "http://localhost:3000/api/weather?city=Hanoi"
-```
-
-## 📊 Monitoring & Logging
-
-- **Backend**: Morgan cho HTTP logging, custom logging cho application events
-- **AI Services**: Flask logging với structured output
-- **Frontend**: Console logging và error tracking
-
-## 🛡️ Security
-
-- JWT-based authentication
-- CORS configuration
-- Helmet.js security headers
+- JWT access + refresh token
+- Mã hóa mật khẩu bcrypt
+- Helmet security headers
+- CORS whitelist
 - Input validation
-- Password hashing với bcrypt
+- Rate limiting (đang phát triển)
 
-## 🚀 Deployment
+---
 
-### Production Environment Variables
+## ⚡ Tối ưu hiệu năng
 
-```bash
-NODE_ENV=production
-PORT=3000
-DATABASE_URL=postgresql://prod_user:password@db_host:5432/voice_assistant
-JWT_SECRET=production-secret-key
-CORS_ORIGIN=https://yourdomain.com
+- Cache Redis
+- Xử lý async bằng queue
+- Lazy loading AI model
+- WebSocket thay polling
+- Reverse proxy Nginx
+
+---
+
+## 🧯 Chiến lược xử lý lỗi
+
+| Thành phần | Chiến lược                  |
+| ---------- | --------------------------- |
+| AI Service | Retry + fallback            |
+| LLM        | Timeout + fallback response |
+| Redis      | Persistent queue            |
+| DB         | Connection pool             |
+| API        | Circuit breaker (planned)   |
+
+---
+
+## 📡 API mẫu
+
+### Chat API
+
+```http
+POST /api/assistant/chat
+Authorization: Bearer <token>
 ```
 
-### Docker Deployment
-
-**Complete System với Docker Compose:**
-
-```bash
-# Start tất cả services
-docker-compose up -d --build
-
-# Xem status
-docker-compose ps
-
-# Scale services (nếu cần)
-docker-compose up -d --scale backend=2
-
-# Update services
-docker-compose pull && docker-compose up -d
+```json
+{
+  "message": "Thời tiết hôm nay thế nào?"
+}
 ```
 
-**Individual Service Containers:**
+### Response
 
-```bash
-# Frontend only
-docker-compose up -d frontend
-
-# Backend only
-docker-compose up -d backend postgres redis
-
-# AI Services only
-docker-compose up -d ai-services
-
-# Ollama only
-docker-compose up -d ollama ollama-init
+```json
+{
+  "reply": "Hôm nay thời tiết...",
+  "intent": "weather"
+}
 ```
 
-## 🤝 Contributing
+---
 
-1. Fork repository
-2. Tạo feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Create Pull Request
+## 🧪 Chiến lược kiểm thử
 
-## 📝 Todo List
+- Unit test (service layer)
+- Integration test (API + DB)
+- Load test (k6 - planned)
+- Test AI inference
 
-- [x] Docker containerization
-- [x] Mobile app development (React Native/Expo)
-- [x] Automated testing setup
+---
+
+## 📈 Thiết kế mở rộng
+
+### Scale ngang
+
+- Backend stateless
+- Load balancing Nginx
+- Redis shared state
+
+### Giảm nghẽn
+
+- Queue cho LLM inference
+- Cache STT/TTS
+- Read replica DB (future)
+
+---
+
+## 🧭 Roadmap
+
+- [x] Microservices architecture
+- [x] Docker deployment
 - [x] CI/CD pipeline
-- [ ] Rate limiting implementation
-- [ ] Advanced error handling
-- [ ] Performance monitoring
-- [ ] Internationalization (i18n)
-- [ ] Mobile app deployment
+- [x] Monitoring stack
+- [ ] Kubernetes migration
+- [ ] Rate limiting
+- [ ] Multi-language support
+- [ ] Streaming LLM responses
+
+---
 
 ## 📄 License
 
-Dự án được cấp phép theo MIT License.
+MIT License
 
-## 🔍 Troubleshooting
+---
 
-### Common Issues
+## 👨‍💻 Tác giả
 
-1. **Port conflicts**: Đảm bảo các ports 3000, 5000, 5173 đang available
-2. **Database connection**: Kiểm tra PostgreSQL đang chạy và connection string đúng
-3. **CORS errors**: Xác nhận CORS_ORIGIN trong .env khớp với frontend URL
-4. **AI models**: Đảm bảo đã huấn luyện models trước khi chạy AI services
-
-### Debug Mode
-
-```bash
-# Backend debug
-DEBUG=* npm run dev
-
-# AI Services debug
-FLASK_ENV=development python app.py
-```
-
-## 📚 Additional Resources
-
-- [Flask Documentation](https://flask.palletsprojects.com/)
-- [Express.js Guide](https://expressjs.com/en/guide/)
-- [React Documentation](https://react.dev/)
-- [Socket.IO Documentation](https://socket.io/docs/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+Hệ thống Voice Assistant AI – Dự án Full-stack AI phân tán với microservices, hỗ trợ giọng nói, LLM và DevOps đầy đủ.

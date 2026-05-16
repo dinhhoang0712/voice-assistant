@@ -1,5 +1,5 @@
 import axios from "axios";
-import { normalizeText } from "./helper.js";
+import { cleanupAsrText } from "./helper.js";
 import { env } from "./env.js";
 
 const HARD_SMALLTALK = [
@@ -38,7 +38,7 @@ function isKnowledgeQuery(text) {
 }
 
 export function isSmalltalk(text) {
-  text = normalizeText(text);
+  text = cleanupAsrText(text);
 
   console.log("[INPUT]:", text);
   if (isKnowledgeQuery(text)) {
@@ -84,7 +84,7 @@ export async function getWeather() {
 }
 
 export async function handleSmalltalk(text) {
-  text = normalizeText(text);
+  text = cleanupAsrText(text);
 
   if (text.includes("thời tiết")) {
     return await getWeather();

@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { connectDb } from "./db/sequelize.js";
+import { connectDb } from "./config/db.js";
 import cors from "cors";
 import { env } from "./utils/env.js";
 import helmet from "helmet";
@@ -18,6 +18,12 @@ import { historyRouter } from "./routes/historyRouter.js";
 import { userRouter } from "./routes/userRouter.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import "./workers/reminderWorker.js";
+import {
+  register,
+  requestMetricsMiddleware,
+  activeConnections,
+  socketConnections,
+} from "./utils/metrics.js";
 process.env.TZ = "Asia/Ho_Chi_Minh";
 
 const app = express();
@@ -44,6 +50,7 @@ app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(cookieParser());
 app.use(cors({ origin: corsOriginOption, credentials: true }));
+app.use(requestMetricsMiddleware);
 
 /**
  * @swagger
@@ -59,7 +66,19 @@ app.use(cors({ origin: corsOriginOption, credentials: true }));
  *             schema:
  *               $ref: '#/components/schemas/HealthResponse'
  */
-app.get("/api/health", (_req, res) => res.json({ ok: true }));
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "voice-assistant-backend",
+    time: new Date().toISOString(),
+  });
+});
+
+// Prometheus metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
 // Swagger documentation
 app.use(
   "/api-docs",
@@ -73,7 +92,7 @@ app.use(
 
 app.use("/api/auth", authRouter);
 
-app.use(protectedRoute);
+app.use("/api", protectedRoute);
 
 app.use("/api/assistant", assistantRouter);
 app.use("/api/reminders", reminderRoutes);

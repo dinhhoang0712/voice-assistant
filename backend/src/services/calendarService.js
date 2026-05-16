@@ -1,20 +1,25 @@
-import { normalizeText } from "../utils/helper.js";
+import { cleanupAsrText } from "../utils/helper.js";
 import { listPendingReminders } from "../repository/reminderRepository.js";
 import {
   detectCalendarAction,
   tryRuleBased,
-} from "../utils/calendar/calendarParser.js";
+} from "../utils/calendar/parsing/calendarParser.js";
 import {
   handleListAction,
   handleDeleteAction,
   handleUpdateAction,
   handleCreateAction,
-} from "../utils/calendar/calendarActions.js";
+} from "../utils/calendar/actions/calendarActions.js";
 
 export async function calendarHandler(rawText, userId) {
-  const normalized = normalizeText(rawText);
+  const normalized = cleanupAsrText(rawText);
   const action = detectCalendarAction(normalized);
-  const { now, title: ruleTitle, reminderTime, hasAnySignal } = tryRuleBased(rawText);
+  const {
+    now,
+    title: ruleTitle,
+    reminderTime,
+    hasAnySignal,
+  } = tryRuleBased(normalized);
 
   // ===== LIST =====
   if (action === "list") {
@@ -22,7 +27,10 @@ export async function calendarHandler(rawText, userId) {
   }
 
   // Load recent reminders for delete/update disambiguation
-  const recent = action === "create" ? [] : await listPendingReminders(userId, { limit: 30 });
+  const recent =
+    action === "create"
+      ? []
+      : await listPendingReminders(userId, { limit: 30 });
 
   // ===== DELETE =====
   if (action === "delete") {
@@ -31,9 +39,23 @@ export async function calendarHandler(rawText, userId) {
 
   // ===== UPDATE =====
   if (action === "update") {
-    return await handleUpdateAction(userId, normalized, rawText, recent, now, reminderTime);
+    return await handleUpdateAction(
+      userId,
+      normalized,
+      rawText,
+      recent,
+      now,
+      reminderTime,
+    );
   }
 
   // ===== CREATE =====
-  return await handleCreateAction(userId, rawText, now, ruleTitle, reminderTime, hasAnySignal);
+  return await handleCreateAction(
+    userId,
+    rawText,
+    now,
+    ruleTitle,
+    reminderTime,
+    hasAnySignal,
+  );
 }

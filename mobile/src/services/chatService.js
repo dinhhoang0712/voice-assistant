@@ -9,9 +9,7 @@ const chatService = {
     try {
       const response = await axios.post(
         `${API_URL}/chat`,
-
         { message, platform: "mobile" },
-
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -23,7 +21,6 @@ const chatService = {
       if (error.response) {
         throw error.response.data;
       }
-
       throw { message: "Không thể kết nối tới Server" };
     }
   },
@@ -53,13 +50,11 @@ const chatService = {
           "Content-Type": "multipart/form-data",
         },
       });
-
       return response.data;
     } catch (error) {
       if (error.response) {
         throw error.response.data;
       }
-
       throw { message: "Không thể xử lý giọng nói" };
     }
   },
@@ -80,7 +75,6 @@ const chatService = {
       if (error.response) {
         throw error.response.data;
       }
-
       throw { message: "Không thể tải lịch sử trò chuyện" };
     }
   },

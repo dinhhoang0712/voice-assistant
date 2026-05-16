@@ -28,7 +28,8 @@ export default function SignInPage() {
       setUserData(null);
       setLoading(false);
       setErr(
-        error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.",
+        error.response?.data?.message ||
+          "Đăng nhập thất bại. Vui lòng thử lại.",
       );
     }
   };
@@ -46,7 +47,7 @@ export default function SignInPage() {
           Đăng nhập <span className="text-sky-300">Trợ lý giọng nói</span>
         </h1>
         <p className="text-white/70 text-sm text-center max-w-sm">
-          Dùng tài khoản đã đăng ký trên hệ thống backend (email + mật khẩu).
+          Dùng tài khoản đã đăng ký trên hệ thống (email + mật khẩu).
         </p>
 
         <input

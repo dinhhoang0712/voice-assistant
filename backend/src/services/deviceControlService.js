@@ -1,5 +1,5 @@
 import { SERVICES } from "../constant/service_targets.js";
-import { normalizeText } from "../utils/helper.js";
+import { cleanupAsrText } from "../utils/helper.js";
 
 const SEARCH_WORDS =
   /\b(tìm|search|tra|tra cứu|tìm kiếm|mở|xem|nghe|bật|play|kiếm)\b/i;
@@ -19,7 +19,7 @@ const cleanupQuery = (query = "") => {
 };
 
 const extractQuery = (text) => {
-  const t = normalizeText(text);
+  const t = cleanupAsrText(text);
 
   const patterns = [
     /\b(?:mở|bật|nghe|xem)\s+(?:cho tôi|giúp tôi|tôi)?\s*(?:một|1)?\s*(?:bài|nhạc|bài hát|video|clip)?\s*(.+?)\s*(?:trên|ở)\s+(youtube|spotify|facebook|tiktok|github|google)?$/i,
@@ -53,7 +53,7 @@ const extractQuery = (text) => {
 };
 
 const detectService = (text) => {
-  const t = normalizeText(text);
+  const t = cleanupAsrText(text);
 
   for (const s of SERVICES) {
     for (const n of s.names) {
@@ -103,7 +103,7 @@ const pickMobileDeepLink = (service) => {
 };
 
 export async function deviceHandler(text, { platform = "unknown" } = {}) {
-  const t = normalizeText(text);
+  const t = cleanupAsrText(text);
 
   const service = detectService(t) || SERVICES.find((s) => s.id === "google");
 

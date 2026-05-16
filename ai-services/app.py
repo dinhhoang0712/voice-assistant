@@ -4,8 +4,12 @@ from routes.stt_routes import stt_bp
 from routes.tts_routes import tts_bp
 from routes.intent_routes import intent_bp
 from routes.faq_routes import faq_bp
+from utils.metrics import init_metrics
 
 app = Flask(__name__)
+
+# Initialize Prometheus metrics
+init_metrics(app)
 
 app.register_blueprint(stt_bp)
 app.register_blueprint(tts_bp)
