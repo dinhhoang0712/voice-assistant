@@ -2,6 +2,9 @@ import axios from "axios";
 import { env } from "../utils/env.js";
 import { getUserConversations } from "../repository/conversationRepository.js";
 import { findUserById as findById } from "../repository/userRepository.js";
+import { createChildLogger } from "../utils/logger.js";
+
+const llmLogger = createChildLogger({ module: 'llm-service' });
 
 const cleanLlmOutput = (answer) => {
   if (!answer) return "";
@@ -74,8 +77,12 @@ const formatHistory = (conversations) => {
 
 export const generateAnswer = async (userId, text) => {
   try {
-    if (!text?.trim()) return "Bạn có thể nói lại không?";
+    if (!text?.trim()) {
+      llmLogger.warn('Empty text provided', { userId });
+      return "Bạn có thể nói lại không?";
+    }
 
+    llmLogger.info('Generating LLM answer', { userId, textLength: text.length });
     const user = await findById(userId);
     const profile = user?.profile || {};
 
@@ -112,6 +119,7 @@ ${formatHistory(conversations)}
 ${text}
 `;
 
+    llmLogger.info('Calling LLM API', { userId, model: env.LLM_MODEL });
     const response = await axios.post(
       env.LLM_URL,
       {
@@ -143,10 +151,12 @@ ${text}
 
     const output = data?.choices?.[0]?.message?.content || "";
 
-    console.log("--------------------------", output);
-    return cleanLlmOutput(output) || "Tôi chưa thể trả lời lúc này.";
+    llmLogger.info('LLM response received', { userId, outputLength: output.length });
+    const cleanedOutput = cleanLlmOutput(output) || "Tôi chưa thể trả lời lúc này.";
+    llmLogger.info('LLM answer generated successfully', { userId, answerLength: cleanedOutput.length });
+    return cleanedOutput;
   } catch (err) {
-    console.error("LLM Error:", err);
+    llmLogger.error('LLM API error', { error: err.message, stack: err.stack, userId });
     return "Đã xảy ra lỗi khi gọi AI.";
   }
 };

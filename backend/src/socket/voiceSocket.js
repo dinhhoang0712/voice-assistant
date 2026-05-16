@@ -5,6 +5,9 @@ import FormData from "form-data";
 import { randomUUID } from "crypto";
 
 import { convertWebmToWav } from "../utils/ffmpeg.js";
+import { createChildLogger } from "../utils/logger.js";
+
+const voiceLogger = createChildLogger({ module: 'voice-socket' });
 
 const sessions = new Map();
 
@@ -62,7 +65,7 @@ class VoiceSession {
 
   enqueue(task) {
     this.queue = this.queue.then(task).catch((err) => {
-      console.error("Queue error:", err);
+      voiceLogger.error('Queue error', { error: err.message, stack: err.stack, sessionId: this.id });
     });
     return this.queue;
   }
@@ -72,9 +75,10 @@ class VoiceSession {
 export const registerVoiceSocket = (io, socket) => {
   const session = new VoiceSession(socket.id);
   sessions.set(socket.id, session);
+  voiceLogger.info('Voice session created', { socketId: socket.id });
 
   socket.on("voice:start", () => {
-    console.log("Voice started:", socket.id);
+    voiceLogger.info('Voice started', { socketId: socket.id });
     session.buffer.reset();
     session.retryCount = 0;
   });
@@ -97,6 +101,7 @@ export const registerVoiceSocket = (io, socket) => {
   });
 
   socket.on("voice:end", () => {
+    voiceLogger.info('Voice ended', { socketId: socket.id });
     const s = sessions.get(socket.id);
     if (!s) return;
 
@@ -114,6 +119,7 @@ export const registerVoiceSocket = (io, socket) => {
   });
 
   socket.on("disconnect", () => {
+    voiceLogger.info('Voice socket disconnected', { socketId: socket.id });
     cleanupSession(socket.id);
   });
 };
@@ -131,6 +137,7 @@ async function processAudio(io, socket, session) {
 
     if (!audioBuffer.length) return;
 
+    voiceLogger.info('Processing audio', { socketId: socket.id, audioSize: audioBuffer.length });
     const tempDir = "temp";
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
@@ -141,14 +148,14 @@ async function processAudio(io, socket, session) {
 
     fs.writeFileSync(webmPath, audioBuffer);
 
-    console.log("WEBM CREATED:", webmPath);
+    voiceLogger.info('WEBM file created', { socketId: socket.id, webmPath });
 
     await Promise.race([
       convertWebmToWav(webmPath, wavPath),
       timeout(VOICE_CONFIG.PROCESSING_TIMEOUT, "FFmpeg timeout"),
     ]);
 
-    console.log("WAV CREATED:", wavPath);
+    voiceLogger.info('WAV file created', { socketId: socket.id, wavPath });
 
     const form = new FormData();
     form.append("audio", fs.createReadStream(wavPath));
@@ -161,7 +168,7 @@ async function processAudio(io, socket, session) {
       timeout(VOICE_CONFIG.PROCESSING_TIMEOUT, "Whisper timeout"),
     ]);
 
-    console.log("WHISPER:", response.data);
+    voiceLogger.info('Whisper response received', { socketId: socket.id, text: response.data.text });
 
     socket.emit("transcript:partial", {
       text: response.data.text || "",
@@ -169,16 +176,17 @@ async function processAudio(io, socket, session) {
       processingTime: Date.now() - start,
     });
 
+    voiceLogger.info('Transcript emitted', { socketId: socket.id, processingTime: Date.now() - start });
     // SUCCESS → reset buffer
     session.buffer.reset();
     session.retryCount = 0;
   } catch (err) {
-    console.error("AUDIO ERROR:", err);
+    voiceLogger.error('Audio processing error', { error: err.message, stack: err.stack, socketId: socket.id });
 
     session.retryCount++;
 
     if (session.retryCount <= VOICE_CONFIG.RETRY_ATTEMPTS) {
-      console.log("Retry:", session.retryCount);
+      voiceLogger.info('Retrying audio processing', { socketId: socket.id, attempt: session.retryCount });
 
       socket.emit("transcript:retry", {
         attempt: session.retryCount,
@@ -188,6 +196,7 @@ async function processAudio(io, socket, session) {
       return;
     }
 
+    voiceLogger.error('Audio processing failed after retries', { socketId: socket.id, retryCount: session.retryCount });
     socket.emit("transcript:error", {
       error: "Processing failed after retries",
     });
@@ -206,9 +215,12 @@ function timeout(ms, msg) {
 async function cleanup(...files) {
   for (const f of files) {
     try {
-      if (f && fs.existsSync(f)) fs.unlinkSync(f);
+      if (f && fs.existsSync(f)) {
+        fs.unlinkSync(f);
+        voiceLogger.info('File cleaned up', { filePath: f });
+      }
     } catch (e) {
-      console.error("Cleanup error:", e);
+      voiceLogger.error('Cleanup error', { error: e.message, filePath: f });
     }
   }
 }
@@ -216,7 +228,7 @@ async function cleanup(...files) {
 function cleanupSession(id) {
   const s = sessions.get(id);
   if (s) {
-    console.log("Cleanup session:", id);
+    voiceLogger.info('Session cleaned up', { sessionId: id });
     sessions.delete(id);
   }
 }

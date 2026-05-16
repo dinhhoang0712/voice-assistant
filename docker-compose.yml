@@ -293,6 +293,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3001
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
 
     volumes:
       - grafana_data:/var/lib/grafana
@@ -301,6 +302,52 @@ services:
 
     depends_on:
       - prometheus
+      - loki
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # LOKI
+  # =========================
+  loki:
+    image: grafana/loki:latest
+
+    container_name: voice-assistant-loki
+
+    ports:
+      - "3100:3100"
+
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+
+    command: -config.file=/etc/loki/local-config.yaml
+
+    restart: unless-stopped
+
+    networks:
+      - voice-assistant-network
+
+  # =========================
+  # PROMTAIL
+  # =========================
+  promtail:
+    image: grafana/promtail:latest
+
+    container_name: voice-assistant-promtail
+
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+
+    command: -config.file=/etc/promtail/config.yml
+
+    depends_on:
+      - loki
 
     restart: unless-stopped
 
@@ -315,6 +362,7 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+  loki_data:
 
 # =========================
 # NETWORK

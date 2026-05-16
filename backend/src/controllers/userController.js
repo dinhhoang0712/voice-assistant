@@ -2,6 +2,9 @@ import {
   findUserById,
   updateUserProfile,
 } from "../repository/userRepository.js";
+import { logger, createChildLogger } from "../utils/logger.js";
+
+const userLogger = createChildLogger({ module: 'user' });
 
 function publicUserShape(user) {
   const profile = user.profile || {};
@@ -15,15 +18,17 @@ function publicUserShape(user) {
 
 export const getMe = async (req, res) => {
   try {
+    userLogger.info('Get user profile request', { userId: req.user.id });
     return res.status(200).json(publicUserShape(req.user));
   } catch (error) {
-    console.error("getMe error", error);
+    userLogger.error('Get user profile error', { error: error.message, stack: error.stack, userId: req.user.id });
     return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
 
 export const updateProfile = async (req, res) => {
   try {
+    userLogger.info('Update profile request', { userId: req.user.id });
     // nhận toàn bộ json gửi lên
     const profileData = req.body;
 
@@ -33,6 +38,7 @@ export const updateProfile = async (req, res) => {
       typeof profileData !== "object" ||
       Array.isArray(profileData)
     ) {
+      userLogger.warn('Invalid profile data', { userId: req.user.id, profileData });
       return res.status(400).json({
         message: "Profile data phải là JSON object",
       });
@@ -44,12 +50,13 @@ export const updateProfile = async (req, res) => {
       attributes: { exclude: ["hashedPassword"] },
     });
 
+    userLogger.info('Profile updated successfully', { userId: req.user.id });
     return res.status(200).json({
       message: "Cập nhật profile thành công",
       user: publicUserShape(user),
     });
   } catch (error) {
-    console.error("updateProfile error", error);
+    userLogger.error('Update profile error', { error: error.message, stack: error.stack, userId: req.user.id });
 
     return res.status(500).json({
       message: "Lỗi hệ thống",

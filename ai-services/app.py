@@ -5,8 +5,12 @@ from routes.tts_routes import tts_bp
 from routes.intent_routes import intent_bp
 from routes.faq_routes import faq_bp
 from utils.metrics import init_metrics
+from utils.logger import get_logger
 
 app = Flask(__name__)
+
+# Initialize logger
+logger = get_logger()
 
 # Initialize Prometheus metrics
 init_metrics(app)
@@ -24,7 +28,7 @@ def home():
     }
 
 if __name__ == "__main__":
-
+    logger.info("Starting AI Services on port 5000")
     app.run(
         host="0.0.0.0",
         port=5000,

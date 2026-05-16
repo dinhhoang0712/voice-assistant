@@ -291,6 +291,83 @@ jobs:
 - Latency AI inference
 - Queue processing
 
+### Loki Log Aggregation
+
+Hệ thống sử dụng **Loki** để thu thập và quản lý logs từ tất cả các services:
+
+#### Kiến trúc Logging
+
+```text
+Services (Backend/AI Services)
+        ↓
+    Loki Clients (pino-loki / loki-logger-handler)
+        ↓
+    Loki Server (port 3100)
+        ↓
+    Grafana Dashboard
+```
+
+#### Cấu hình
+
+**Backend (Node.js):**
+- Logger sử dụng `pino` + `pino-loki`
+- Cấu hình trong `backend/src/utils/logger.js`
+- Environment variables:
+  - `LOKI_URL`: URL của Loki server (default: `http://loki:3100`)
+  - `LOG_LEVEL`: Level logging (default: `info`)
+  - `NODE_ENV`: Environment (default: `development`)
+
+**AI Services (Python):**
+- Logger sử dụng `logging` + `loki-logger-handler`
+- Cấu hình trong `ai-services/utils/logger.py`
+- Environment variables:
+  - `LOKI_URL`: URL của Loki server (default: `http://loki:3100`)
+  - `LOG_LEVEL`: Level logging (default: `INFO`)
+  - `FLASK_ENV`: Environment (default: `development`)
+
+#### Sử dụng
+
+**Trong Backend:**
+```javascript
+import { logger, createChildLogger } from './utils/logger.js';
+
+// Sử dụng logger chính
+logger.info('Server started');
+logger.error('Error occurred', { error: err });
+
+// Tạo child logger với context
+const childLogger = createChildLogger({ module: 'auth' });
+childLogger.info('User logged in', { userId });
+```
+
+**Trong AI Services:**
+```python
+from utils.logger import get_logger
+
+logger = get_logger()
+logger.info('Processing audio file')
+logger.error('STT failed', {'error': str(e)})
+```
+
+#### Truy cập Logs
+
+1. **Grafana Dashboard:**
+   - Truy cập: `http://localhost:3001`
+   - Login với credentials mặc định: `admin/admin`
+   - Chọn "Explore" → Chọn datasource "Loki"
+   - Query logs bằng label filters:
+     - `{service="voice-assistant-backend"}`
+     - `{service="voice-assistant-ai-services"}`
+
+2. **Loki API:**
+   - Direct API: `http://localhost:3100`
+   - Query logs qua API endpoint `/loki/api/v1/query`
+
+#### Log Retention
+
+- Logs được lưu giữ trong 7 ngày (168h) mặc định
+- Có thể cấu hình trong `monitoring/loki/loki-config.yml`
+
 ---
 
 ## 🗄️ Thiết kế cơ sở dữ liệu

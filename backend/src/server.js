@@ -24,6 +24,7 @@ import {
   activeConnections,
   socketConnections,
 } from "./utils/metrics.js";
+import { logger, httpRequestLogger } from "./utils/logger.js";
 process.env.TZ = "Asia/Ho_Chi_Minh";
 
 const app = express();
@@ -45,7 +46,7 @@ const PORT = env.port;
 
 // middlewares
 app.use(helmet());
-app.use(morgan("dev"));
+app.use(httpRequestLogger);
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(cookieParser());
@@ -105,8 +106,8 @@ connectDb().then(() => {
   initializeSocketHandlers(io);
 
   server.listen(PORT, () => {
-    console.log(`Server bắt đầu trên cổng ${PORT}`);
-    console.log(`Socket.IO server is running`);
-    console.log(`Reminder worker is running`);
+    logger.info(`Server bắt đầu trên cổng ${PORT}`);
+    logger.info(`Socket.IO server is running`);
+    logger.info(`Reminder worker is running`);
   });
 });

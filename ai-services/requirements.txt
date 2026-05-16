@@ -11,4 +11,6 @@ gunicorn==21.2.0
 pandas==2.1.4
 sentence-transformers
 prometheus-client
+loki-logger-handler
+python-json-logger
 
