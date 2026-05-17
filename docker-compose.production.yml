@@ -101,7 +101,13 @@ services:
       - ./ai-services/data:/app/data
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:5000/health')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -255,7 +261,6 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=${GRAFANA_ROOT_URL:-http://localhost:3001}
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
 
     volumes:
       - grafana_data:/var/lib/grafana
@@ -269,7 +274,7 @@ services:
     networks:
       - voice-assistant-network
 
- # =========================
+  # =========================
   # LOKI
   # =========================
   loki:
